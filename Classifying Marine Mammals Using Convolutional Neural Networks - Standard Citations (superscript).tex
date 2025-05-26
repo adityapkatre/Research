@@ -61,6 +61,10 @@ Prior to selecting EfficientNetB5 as our backbone architecture, experiments were
 
 EfficientNetB5 was compared against several baseline architectures, including ResNet50, EfficientNetB3, EfficientNetB5, and EfficientNetB7. The selection of EfficientNetB5 was based on its balance between accuracy and computational cost. Specifically, EfficientNetB5 demonstrated superior feature extraction capabilities and reasonable computational demand compared to other models when tested on the Happywhale dataset.
 
+\subsection{Addressing Class Imbalance}
+
+The Happywhale dataset exhibits a sever class imbalance, with the number of 
+
 \subsection{Data Preparation and Augmentation}
 
 Kaggle’s Happywhale dataset is split into training and testing sets. A CSV file containing the filename for each image and the corresponding label for the image is included. Some labels include: \(bottlenose\_dolphin\), \(beluga\), \(killer\_whale\), \(blue\_whale\), and many others. Each image in the training set undergoes a series of transformations to improve the model’s capability to process and develop an understanding of features in the images. The key transformations that the images undergo include:
@@ -76,6 +80,63 @@ Kaggle’s Happywhale dataset is split into training and testing sets. A CSV fil
     \includegraphics[width=0.7\linewidth]{model3.jpg}
     \caption{A visual representation of the third model.}
 \end{figure}
+
+\subsection{Class Imbalance Analysis}
+
+The Happywhale training dataset exhibits severe class imbalance across species, with bottlenose dolphnis representing 9,664 images while species such as Fraser's dolphins contain only 14 images.  Image classes such as the Killer Whale are in the middle of the pack, representing 962 images in the training dataset. 
+
+The species distribution follows a pattern commonly seen in real-world ecological datasets. The top five most common species accounts for 64.7\% of all images, while the bottom 10 species collectively represent less than 3\% of the dataset. Individual-level imbalance is even more pronounced, with some individuals appearing in hundreds of images while others have only single instances. 
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{l r}
+\hline
+\textbf{Species} & \textbf{Image Count} \\
+\hline
+\texttt{bottlenose\_dolphin}           & 9\,664 \\
+\texttt{beluga}                        & 7\,443 \\
+\texttt{humpback\_whale}               & 7\,392 \\
+\texttt{blue\_whale}                   & 4\,830 \\
+\texttt{false\_killer\_whale}          & 3\,326 \\
+\texttt{dusky\_dolphin}                & 3\,139 \\
+\texttt{spinner\_dolphin}              & 1\,700 \\
+\texttt{melon\_headed\_whale}          & 1\,689 \\
+\texttt{minke\_whale}                  & 1\,608 \\
+\texttt{killer\_whale}                 & 1\,493 \\
+\texttt{fin\_whale}                    & 1\,324 \\
+\texttt{gray\_whale}                   & 1\,123 \\
+\texttt{bottlenose\_dolpin}            & 1\,117 \\
+\texttt{kiler\_whale}                  &   962 \\
+\texttt{southern\_right\_whale}        &   866 \\
+\texttt{spotted\_dolphin}              &   490 \\
+\texttt{sei\_whale}                    &   428 \\
+\texttt{short\_finned\_pilot\_whale}   &   367 \\
+\texttt{common\_dolphin}               &   347 \\
+\texttt{cuviers\_beaked\_whale}        &   341 \\
+\texttt{pilot\_whale}                  &   262 \\
+\texttt{long\_finned\_pilot\_whale}    &   238 \\
+\texttt{white\_sided\_dolphin}         &   229 \\
+\texttt{brydes\_whale}                 &   154 \\
+\texttt{pantropic\_spotted\_dolphin}   &   145 \\
+\texttt{globis}                        &   116 \\
+\texttt{commersons\_dolphin}           &    90 \\
+\texttt{pygmy\_killer\_whale}          &    76 \\
+\texttt{rough\_toothed\_dolphin}       &    60 \\
+\texttt{frasers\_dolphin}&    14 \\
+\hline
+\end{tabular}
+\caption{Species distribution within the Happywhale dataset.}
+\label{tab:species_counts}
+\end{table}
+
+\subsection{Imbalance Mitigation Strategy}
+
+Our approach to handling the severe class imbalance combines several complementary techniques rather than relying on traditional oversampling methods. The implementation addresses imbalances at multiple stages of the model creation pipeline:
+\begin{enumerate}
+\item Cross-validation Based Data Splitting: We implemented a 10-fold cross-validation strategy that ensures balanced representation across each fold while maintaining the natural distribution within each fold. This approach helps prevent overfitting to overrepresented classes during training and provides more robust performance across groups with different frequencies in the  dataset. 
+\item Augmentation-based Minority Class Enhancement: Rather than utilizing traditional oversampling methods, we applied data augmentation techniques, such as random horizontal flipping and other techniques, across all classes. This strategy indirectly benefits minority classes by increasing their effective representation through transformations while preserving biological features critical for species identification.
+\item Natural distribution preservation: Maintaining original class distribution during training was feasible because natural encounter frequencies present in the training dataset contain valuable ecological information. Artificially balancing the training dataset can disrupt learned patterns that reflect real-world probabilities. 
+\end{enumerate}
 
 \subsection{Training Strategy}
 
@@ -329,8 +390,6 @@ The 30 coefficients ${\alpha}$ were learned with a 5-fold cross-validation split
 
 The best single checkpoint (ElasticFace EfficientNet‑B5, 768‑px) attains a MAP@5 score of 0.854. Utilizings its predictions in the ensemble lifts the MAP@5 score to 0.882 on  out-of-fold predictions. On Kaggle's public leaderboard, the same blend scored 0.8806.
 
-
-
 \subsection{Key Learnings}
 
 \begin{enumerate}
@@ -338,12 +397,13 @@ The best single checkpoint (ElasticFace EfficientNet‑B5, 768‑px) attains a M
     \item Model Architectures: The use of model architectures was also critical to the success of more advanced models. The use of the EfficientNetB5 model architecture allowed the model to outperform the basic CNN architecture. This is attributed to this backbone's ability to effectively scale across various levels of depth, width, and resolutions. Selecting architectures that strike a balance between computational efficiency and representational power is important for this machine learning task.
     \item Data Augmentation: Using data augmentation techniques enhances the robustness of the models through grayscale transformations and color adjustments. This shows the importance of data augmentation strategies in mimicking real-world variances in images and helping the model effectively generalize. 
     \item Ensembles: The ensemble approach to this Machine Learning challenge showed how combining multiple perspectives on the same data can yield significantly better results. Model four effectively took advantage of the various strengths in snapshots, leading to better performance in the dataset.
+    \item Class Imbalance Limitations: While our approach to handling imbalances showed effectiveness, the extreme imbalance remains a fundamental challenge. Traditional rebalancing techniques were deemed inappropriate for this task due to the potential disruption of natural ecological patterns and need to analyze fine-grained differences in images to classify images. 
     \item Handling Imbalanced Data: The Happywhale dataset has an unequal distribution of images with an unequal distribution of training samples for certain individuals. However, our models resolved this issue using margin loss and cross-validation to help the model generalize and become more robust to unseen data.
 \end{enumerate}
 
 \section{Conclusion}
 
-This study is an application of advanced deep learning methodologies to overcome the challenge of identifying marine mammals using the Happywhale dataset. The models leveraged modern convolutional architectures, loss functions, and data augmentation strategies. This research efficiently addresses the challenge of classifying fine-grained image data to advance ecological research. This study showcased models that progressed from a baseline CNN model with limited classification capabilities to high-performing models that incorporate advanced backbones and loss functions to effectively make predictions.
+This study is an application of advanced deep learning methodologies to overcome the challenge of identifying marine mammals using the Happywhale dataset. The models leveraged modern convolutional architectures, loss functions, and data augmentation strategies. This research efficiently addresses the challenge of classifying fine-grained image data to advance ecological research. This study showcased models that progressed from a baseline CNN model with limited classification capabilities to high-performing models that incorporate advanced backbones and loss functions to effectively make predictions. This study also acknowledges and address the significant class imbalance present in the dataset, and showcased a non-traditional strategy to mitigate the effects.  
 
 The iterative approach of progressing through four separate models shows that refining components ranging from network depth to augmentation methods can lead to breakthroughs in the performance of the machine learning model. Specifically, the KNN algorithm proved to be critical in categorizing unseen images while maintaining a clear, defined boundary between marine mammal species. Using all the techniques described in this study, an identification system has been created to assist environmentalists in tracking marine mammalian populations without relying on labor-intensive manual matching.
 
