@@ -146,11 +146,30 @@ Training occurred on a Tensor Processing Unit on Google Cloud, significantly spe
     \item \textbf{Multiple-Sample Dropout: }To improve generalization, multiple-sample dropout is used with different dropout rates on feature embeddings. The outputs are averaged to reduce overfitting while retaining rich feature information\textsuperscript{6}.
 \end{itemize}
 
-\subsection{Inference and Threshold Tuning}
+\subsection{K-Nearest-Neighbor Head}
 
-When inferencing, the model uses k-nearest neighbors to match each image in the testing set to the closest image it trained with using cosine similarity. This step allows the model to make accurate predictions by matching features in training images with testing images\textsuperscript{7}.
+A soft-max layer assumes a closed set of labels, yet about 10\% of Happywhale test images belong to individuals not present in the training dataset. A KNN head supports this open-set scenario. If no neighbor is sufficiently close we assign a given image the label \texttt{new_individual}textsuperscript{7}.
 
-A thresholding strategy is utilized to refine the weightage between known, identifiable labels and “\(new\_individual\)” (unknown) labels. This threshold is enhanced using the validation set to maximize precision and distinguish known and new images of animals. If a higher threshold is selected, the model will be more conservative in predicting “\(new\_individual\)”, whereas a low threshold is more inclusive to assigning to labeling certain classes.
+For each query to the KNN head, the model performs four steps:
+\begin{enumerate}
+    \item Run the image through the CNN and take the 512-dimensional feature vector that is generated right before the ArcFace head.
+    \item Normalize the vector by dividing it by its own magnitude. As a result the vector will have unit length, or a vector of 1. This results in the dot-product of two vectors being equal to their cosine similarity.
+    \item Use \texttt{scikit-learn}'s \texttt{NearestNeighbors} to find the &k& closest training vectors. This takes about 14 milliseconds on a single CPU core.
+    \item Finally, the KNN head counts how many times each label appears among its neighbors.  The label that appears the most commonly is the prediction. If a tie occurs, the label with the shortest inverse distance is chosen.\\
+\end{enumerate}
+
+\subsection{Hyper-parameter selection for $k$}
+
+A grid search on the validation fold with $k\!=\!1,3,5,10,20,50,75,100$ shows performance peaking at $k=50$. 
+
+$k=50$ was chosen because smaller values resulted in instability among minority classes, and larger values added distractors.
+
+\subsection{Distance-based thresholds for \texttt{new_individual}}
+
+Let $d_{(1)}$ be the distance to the closest neighbor and define a confidence $c = 1 - d_{(1)}$.
+A grid search found that if $c < 0.38$ the safest choice is to output
+the special label \texttt{new\_individual}.
+This allowed a balance between false positives of assigning the label \texttt{new_individual} to an image while ensuring this label is not overused.
 
 \subsection{Ensemble and Blending}
 
