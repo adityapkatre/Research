@@ -55,6 +55,11 @@ The model uses EfficientNetB5 as its backbone. EfficientNetB5 is a convolutional
 
 The Elastic ArcFace loss layer is introduced as the classification head for this model. ArcFace increases the separation between different classes, improving the model’s ability to distinguish images. It achieves this by introducing Additive Angular Margin Loss to the feature vectors. This additional margin in ArcFace creates a more robust distinction between image classes. This enhanced the model’s discriminative learning and accuracy in identifying images across a large subset of classes. The loss layer operates by normalizing each feature and then using a cosine similarity metric for each feature. Then, ArcFace makes it easier to distinguish between classes by adding a fixed angle, or angular margin, between the feature vector and target class. This contributes to making class boundaries more distinct, enforcing a distinct separation between classes. The Elastic variation of ArcFace introduces elasticity, or randomness, to the angular margin, causing the model to perform better against slight, almost random variations in images that are part of the same category\textsuperscript{5}.
 
+\subsection{Architecture Selection Rationale}
+
+Prior to selecting EfficientNetB5 as our backbone architecture, experiments were conducted to compare multiple models on their inferencing capabilities on the Happywhale dataset. Our selection criteria included computational efficiency when using Tensor Processing Units (TPUs), performance on fine-grained image classification tasks, and its ability to process high-resolution images while using maintaining reasonable memory requirements. 
+
+EfficientNetB5 was compared against several baseline architectures, including ResNet50, EfficientNetB3, EfficientNetB5, and EfficientNetB7. The selection of EfficientNetB5 was based on its balance between accuracy and computational cost. Specifically, EfficientNetB5 demonstrated superior feature extraction capabilities and reasonable computational demand compared to other models when tested on the Happywhale dataset.
 
 \subsection{Data Preparation and Augmentation}
 
@@ -74,7 +79,7 @@ Kaggle’s Happywhale dataset is split into training and testing sets. A CSV fil
 
 \subsection{Training Strategy}
 
-Training occurred on a Tensor Processing Unit (TPU) on Google Cloud, significantly speeding up training times for this model and using fewer local resources. The batch size is set to 16 * the number of TPU replicas, leveraging Google Cloud’s TPUs. Some methods used to make training more efficient include:
+Training occurred on a Tensor Processing Unit on Google Cloud, significantly speeding up training times for this model and using fewer local resources. The batch size is set to 16 * the number of TPU replicas, leveraging Google Cloud’s TPUs. Some methods used to make training more efficient include:
 
 \begin{itemize}
     \item \textbf{Multiple-Sample Dropout: }To improve generalization, multiple-sample dropout is used with different dropout rates on feature embeddings. The outputs are averaged to reduce overfitting while retaining rich feature information\textsuperscript{6}.
@@ -152,6 +157,10 @@ Combining the EfficientNetB5 backbone, Elastic ArcFace facial discrimination cap
 \section{Results}
 
 The experiments for this project were conducted on four distinct deep learning models that identified individual marine animals using various conditions. The Mean Average Precision at 5 was employed as an evaluation metric. Below, we present the outcomes of these models, along with several diagrams, tables, and figures to visualize the architecture of these models and their performances.
+
+\subsection{Architecture Selection Results}
+
+
 
 Four distinct models, each developed using various architectures and data augmentation techniques, were evaluated:
 
@@ -307,11 +316,20 @@ The data augmentation was also improved in the EfficientNetB5 and Elastic ArcFac
 
 \subsection{Blend of Models}
 
-The Blend of Models achieved the highest accuracy of 0.88 by combining the advancements made in the other models. This approach to the machine learning challenge combined predictions from multiple models that each contained varying data augmentation techniques. 
+The final model utilized an ensemble of 30 independently-trained models. All members are variants of Efficient-NetB5 that differ in input resolution, data-augumentation pipeline, and crop strategy. Five of them are "specialists" that are trained on beluga-only, full-body, or back-fin crops that work to extract features from ambiguities that generic models often miss.
 
-Model snapshots were also impactful in obtaining a high score. Each snapshot represented the model at a different stage of training, capturing diverse perspectives on the data. This training strategy capitalized on the strengths of each model's checkpoints while minimizing the weaknesses. This allowed the model to generalize more effectively and achieve a higher score using the MAP@5 evaluation metric. The score of the blend was higher than that of the standalone EfficientNetB5 backbone, showing how blending strategies can be more adept at categorizing these images. 
+For every image, each component returns its top-5 individual IDs. Let $r_{ij}!\in!{0,\dots,4}$ be the rank assigned by model $j$ to identity~$i$. Ranks are converted to scores through a fixed, monotone lookup $w(r)={10,6.5,3.3,2.9,2.7}$. The ensemble score for identity $i$ is a weighted sum of rank-based scores.
 
-The ensemble also benefits from thorough hyperparameter tuning. For example, the weights given to each snapshot in the blend were fine-tuned through cross-validation, which helped the ensemble achieve the highest overall accuracy. Moreover, employing Elastic ArcFace loss with adaptive margins improved feature discrimination, especially in difficult situations where several animals looked alike.
+\begin{equation}
+s_i;=;\sum_{j=1}^{30} \alpha_j,w(r_{ij});;{-};0.033,f_i,\quad\text{with};f_i=|{\text{training photos of }i}|.
+\end{equation}
+The frequency penalty $0.033 f_i$ mitigates the effects of common whales being present in the dataset. Scores for the label \texttt{new_individual} are down-weighted by 4 whenever it is not ranked first or second, resulting in a reduction in false positives for this label. 
+
+The 30 coefficients ${\alpha}$ were learned with a 5-fold cross-validation split that keeps every whale's images in a single fold. Starting from $\alpha_j = 1$ for each model, a coordinate-wise search was run. We tested each model weight one at a time: we made each weight slightly bigger and smaller by 0.1 while keeping all other weights the same. We kept a change in weight if it improved our MAP@5 score by at least $10^{-3}$. Going through and testing every single weight in this way is how this model is optimized.
+
+The best single checkpoint (ElasticFace EfficientNet‑B5, 768‑px) attains a MAP@5 score of 0.854. Utilizings its predictions in the ensemble lifts the MAP@5 score to 0.882 on  out-of-fold predictions. On Kaggle's public leaderboard, the same blend scored 0.8806.
+
+
 
 \subsection{Key Learnings}
 
