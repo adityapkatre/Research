@@ -81,6 +81,10 @@ Kaggle’s Happywhale dataset is split into training and testing sets. A CSV fil
     \caption{A visual representation of the third model.}
 \end{figure}
 
+\subsection{Data Splitting and Leakage Prevention}
+
+Kaggle distributes the dataset in two completely separate folders in the Happywhale competition. The first, \texttt{train\_images/}, is accompanied by a \texttt{train.csv} file that lists the species and \texttt{individual_id} for every training photo. The second, \texttt{test_images/}, contains unlabeled images. While some individuals that appear in the test set can be absent in the training data, no image in the training folder is duplicated in the test folder. This organizer-enforced separation and organization of images eliminates the risk of leakage between the two data folders.  
+
 \subsection{Class Imbalance Analysis}
 
 The Happywhale training dataset exhibits severe class imbalance across species, with bottlenose dolphnis representing 9,664 images while species such as Fraser's dolphins contain only 14 images.  Image classes such as the Killer Whale are in the middle of the pack, representing 962 images in the training dataset. 
