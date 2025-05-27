@@ -374,9 +374,47 @@ The blending approach shown in Figure 4 uses predictions from various models to 
 
 In summary, the four models showcased progressed from a relatively simple CNN with a score of 0.10 to a high-performing, blended solution that achieved a score of 0.88, which is higher than other baselines showcased in Table 2. These results represent the outcome of creating several iterations and improvements in making predictions in challenging, fine-grained datasets.
 
+\subsection{Model Interpretability with Grad-CAM}
+
+Understanding why a Neural Network predicts a certain way is crucial for conservation work, where biologists may verify that the algorithm focuses on biologically meaningful visual cues rather than the background. We therefore created Gradient-weighted Class Activation Maps
+(Grad-CAM) for a few images. 
+
+\paragraph{Code Excerpt}
+
+To create effective heatmaps, a two step process is used. First, the code generates an activation map for a specific image. Then, it overlays the activation map on the original image. The TensorFlow code that implements this is below:
+
+\begin{lstlisting}[language=Python,basicstyle=\footnotesize\ttfamily]
+heatmap = make_gradcam_heatmap(tensorflow.expand_dims(img, 0),
+    base_model,
+    model,
+    last_conv_layer_name,
+    classifier_layer_names)
+
+# Colorize and resize the heatmap
+jet = matplotlib.cm.get_cmap("jet")
+jet_heatmap = jet(numpy.uint8(255 * heatmap))[..., :3] # Convert to RGB
+jet_heatmap = tensorflow.image.resize(jet_heatmap, img.shape[:2])
+
+# Overlap with the original image and save
+overlay = tf.cast(img, tf.float32) / 255.0 + 0.003 * jet_heatmap
+keras.preprocessing.image.save_img("gradcam_overlay.jpg", overlay)
+\end{lstlisting}
+The resulting images, show below, highlight the pixels that affected the prediction of a given individual the most. This provides conservationists visual confirmation that the CNN is focusing on meaningful regions of images.
+
+\paragraph{Grad-CAMs}
+
+\begin{figure}[H]
+  \includegraphics[width=0.32\linewidth]{gradcam_dusky_dolphin.jpg}
+  \includegraphics[width=0.32\linewidth]{gradcam_humpback_whale.jpg}
+  \includegraphics[width=0.32\linewidth]{gradcam_beluga.jpg}
+  \caption{Grad-CAM overlays for three validation
+  images.  The network focuses on physical cues on parts of the marine animals, and is resistant to noise and distractions in the backgrounds of images.}
+  \label{fig:gradcam_examples}
+\end{figure}
+
 \subsection{Cross-Validation Performance and Reliability}
 
-Performing cross-validation analysis revealed consistent model performance across several evaluation metrics. The narrow confidence intervals (\(\leq\)1.0\% width for accuracy and MAP@5) suggest robust generalizability for the model
+Performing cross-validation analysis revealed consistent model performance across several evaluation metrics. The narrow confidence intervals (\(\leq\)1.0\% width for accuracy and MAP@5) suggest robust generalizability for the model.
 
 \begin{table}
 \begin{tabular}{l c c c}
@@ -393,7 +431,9 @@ By measuring performance variability using standard deviation and confidence int
 \section{Discussion}
 
 The performance of the different models tested in this work provides a series of lessons learned about both the challenges and solutions proposed for the individual identification of whales and dolphins. Analyzing the architecture, optimization strategies, and data augmentation techniques used by the various models allows us to identify which factors contribute most to their relative success.
+
 \subsection{Basic CNN Model}
+
 The Basic CNN Model was implemented using a barebones Convolutional Neural Network (CNN) that served as a baseline model to achieve a score of 0.10. Its limited predictive capabilities can be attributed to several shortcomings apparent in its design and training. Firstly, the architecture of the model required more depth and complexity to increase the model’s discriminative capabilities. The model contained only four convolutional layers and a small amount of image adjustments, both leading to low accuracy. On average, this model struggled with capturing intricate patterns present in the marine mammals in this dataset, such as unique pigmentation, scars, and fin shapes that may be used to distinguish among individuals. In addition, the input images were trimmed, resulting in a loss of fine-grained details necessary for classification. 
 
 Additionally, the data augmentation techniques utilized in the Basic CNN Model—such as rotation, width/height shifts, and zoom—fell short in replicating the varied viewing angles, lighting conditions, and occlusions typical of real-world images. The implementation of a dropout layer at a 50\% rate to prevent overfitting might have unintentionally restricted the model’s capacity to capture subtle features. Furthermore, sparse categorical cross-entropy was adopted as the loss function, yet without incorporating more sophisticated methods like margin-based loss, which constrained the model’s effectiveness in differentiating between visually similar individuals effectively.
