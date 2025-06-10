@@ -179,7 +179,7 @@ The final model predictions are generated through a blending strategy that combi
 \[
 P_{\text{final}} = w_1 P_1 + w_2 P_2 + \dots + w_n P_n
 \]
- where $w_i$ represents the weight assigned to model $i$ and $P_i$ is its prediction.
+ where $w_i$ represents the weight assigned to model $i$ and $P_i$ is its prediction. The complete implementation of our ensemble blending strategy, including a model training notebook and weight selection, is available at https://github.com/adityapkatre/Research.
 
 \subsection{Evaluation Metrics}
 
@@ -241,8 +241,6 @@ Combining the EfficientNetB5 backbone, ArcFace facial discrimination capabilitie
 The experiments for this project were conducted on four distinct deep learning models that identified individual marine animals using various conditions. The Mean Average Precision at 5 was employed as an evaluation metric. Below, we present the outcomes of these models, along with several diagrams, tables, and figures to visualize the architecture of these models and their performances.
 
 \subsection{Architecture Selection Results}
-
-
 
 Four distinct models, each developed using various architectures and data augmentation techniques, were evaluated:
 
