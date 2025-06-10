@@ -74,7 +74,7 @@ Kaggle’s Happywhale dataset is split into training and testing sets. A CSV fil
 \begin{figure}
     \centering
     \includegraphics[width=0.7\linewidth]{model3.jpg}
-    \caption{A visual representation of the third model.}
+    \caption{Flowchart-style architecture diagram of the EfficientNetB5 model with ArcFace loss function. The flowchart begins by performing image augmentations on training data, creates a model, and finally runs to make predictions, which are exported to a CSV format and submitted.}
 \end{figure}
 
 \subsection{Data Splitting and Leakage Prevention}
@@ -258,7 +258,7 @@ Baseline Model 1 & 0.77 \\
 \hline
 Baseline Model 2 & 0.79 \\
 \hline
-EffNetB5 and ArcFace & 0.86 \\ 
+EffNetB3 and ArcFace& 0.86 \\ 
 \hline
 Blend of Models & 0.88 \\ 
 \hline
@@ -304,7 +304,7 @@ model.compile(optimizer='adam',
     metrics=['accuracy'])
 \end{lstlisting}
 \end{minipage}
-\caption{Code snippet for Basic CNN model.}
+\caption{Implementation of the Basic CNN model architecture using TensorFlow/Keras. The model consists of several convolutional layers to extract features from images, and various augmentation methods to improve feature extraction and model performance.}
 \label{fig:model1}
 \end{figure}
 
@@ -341,13 +341,13 @@ def get_model():
         return model,embed_model
 \end{lstlisting}
 \end{minipage}
-\caption{Function to create the EfficientNetB3 model.}
+\caption{Python function \texttt{get_model()}, which builds the training network. It adds a batch-norm, dropout, and a 512-D dense layer before compiling with Adam, specifying a learning rate, and ensuring both the top-1 and top-5 accuracy metrics are provided.}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.5\linewidth]{learning.png}
-    \caption{Learning rate schedule used during training, demonstrating an initial warm-up phase where the learning rate rapidly increases, followed by a peak and a gradual decay over subsequent epochs.}
+    \caption{Learning rate schedule employed during model training. The x-axis represents training epochs (0-30), and y-axis represents the learning rate (×10⁻⁵). The graph displays three separate phases of training: (1) warm-up phase (epochs 0-6) with an almost linear increase from 1×10⁻⁶ to 8×10⁻⁵, (2) brief sustain phase at maximum learning rate, and (3) exponential decay phase (epochs 6-30) that ultimately reaches 1×10⁻⁶. The schedule increases stability of initial training while preventing overfitting in later epochs, allowing the model to be more fit for real-world scenarios represented in the dataset.}
 \end{figure}
 
 The graph illustrates a learning rate schedule employed during the training process of the model with an EfficientNetB5 backbone. The sharp increase then gradual decrease represents the dynamic adjustment of the learning of the model over time. The learning rate (y-axis) initially follows a warm-up phase, which is quickly followed by a peak. As the number of epochs (x-axis) increases, the learning rate gradually decays, which results in the optimization of the model. 
@@ -363,7 +363,7 @@ submission = pd.DataFrame({'image': test_generator.filenames,  'predictions': te
 submission.to_csv('submission.csv', index=False)
 \end{lstlisting}
 \end{minipage}
-\caption{Code snippet showcasing the blending of multiple independent models, achieving an accuracy of 0.88.}
+\caption{Implementation of the ensemble blending strategy that combines predictions from checkpoints of several independent models. The blender function uses outputs from 30 model variants to produce final predictions achieving the highest MAP@5 of 0.88}
 \end{figure}
 
 The blending approach shown in Figure 4 uses predictions from various models to produce a more well-rounded and robust final result. This demonstrates how several models working in combination can result in increased overall production quality.
@@ -403,7 +403,7 @@ The resulting images, show below, highlight the pixels that affected the predict
   \includegraphics[width=0.32\linewidth]{gradcam_humpback_whale.jpg}
   \includegraphics[width=0.32\linewidth]{gradcam_beluga.jpg}
   \caption{Grad-CAM overlays for three validation
-  images.  The network focuses on physical cues on parts of the marine animals, and is resistant to noise and distractions in the backgrounds of images.}
+  images.  The network focuses on physical cues on parts of the marine animals, and is resistant to noise and distractions in the backgrounds of images. First, a \texttt{dusky_dophin} is displayed, with a focus on the dorsal fin. Next, a \texttt{humpback whale}'s dorsal fin and upper body is displayed. Finally, a \texttt{beluga}'s forehead, or melon, is shown.}
   \label{fig:gradcam_examples}
 \end{figure}
 
