@@ -531,6 +531,18 @@ The best single checkpoint (ArcFace with EfficientNet‑B5, 768‑px) attains a 
     \item Handling Imbalanced Data: The Happywhale dataset has an unequal distribution of images with an unequal distribution of training samples for certain individuals. However, our models resolved this issue using margin loss and cross-validation to help the model generalize and become more robust to unseen data.
 \end{enumerate}
 
+\subsection{Practical Applications}
+
+While the technical performance of our machine learning model shows some promise, successfully making an impact on conservation efforts requires integration into existing workflows. This subsection addresses the practicality of this CNN-based approach to identifying marine mammals in the real world.
+
+\paragraph{Integration with Photo identification Databases}
+
+Citizen science portals and research archives, such as Flukebook, already contain lists of records for thousands of animal images. In order to effectively utilize the CNN, it can be used in an API that receives an uploaded image, returns the top $k$ identity labels for an image, and stores it alongside labels assigned manually by humans. This light weight integration interferes with a conservationist's workflow minimally while providing benefits.
+
+\paragraph{Public Engagement and Education}
+
+Embedding the model in a mobile app that allows users to upload images allows whale watchers to obtain instant feedback on which animal they photographed. This mirrors bird identification apps that have increased public participation and raised awareness about ornithology.  In addition, images uploaded to the mobile app may be recoded and used to further improve models, resulting in a positive feedback loop of model improvement and public participation.
+
 \section{Conclusion}
 
 This study is an application of advanced deep learning methodologies to overcome the challenge of identifying marine mammals using the Happywhale dataset. The models leveraged modern convolutional architectures, loss functions, and data augmentation strategies. This research efficiently addresses the challenge of classifying fine-grained image data to advance ecological research. This study showcased models that progressed from a baseline CNN model with limited classification capabilities to high-performing models that incorporate advanced backbones and loss functions to effectively make predictions. This study also acknowledges and address the significant class imbalance present in the dataset, and showcased a non-traditional strategy to mitigate the effects.  
