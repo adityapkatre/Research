@@ -395,7 +395,7 @@ jet_heatmap = tensorflow.image.resize(jet_heatmap, img.shape[:2])
 overlay = tf.cast(img, tf.float32) / 255.0 + 0.003 * jet_heatmap
 keras.preprocessing.image.save_img("gradcam_overlay.jpg", overlay)
 \end{lstlisting}
-The resulting images, show below, highlight the pixels that affected the prediction of a given individual the most. This provides conservationists visual confirmation that the CNN is focusing on meaningful regions of images.
+The resulting images shown below highlight the pixels that affected the prediction of a given individual the most. This provides conservationists visual confirmation that the CNN is focusing on meaningful regions of images.
 
 \paragraph{Grad-CAMs}
 \begin{figure}[H]
@@ -463,9 +463,42 @@ The use of an EfficientNetB5 backbone also boosted the model's performance. The 
 
 The data augmentation was also improved in the EfficientNetB5 and ArcFace Model, using grayscale transformations, color adjustments, and random cropping. The use of these techniques reduced the likelihood of overfitting. Additionally, employing k-fold cross-validation ensured that the model would generalize well against unseen data. 
 
+\subsection{Performance Gap between ResNet + ArcMargin and EffNetB5 + Elastic ArcFace}
+
+The 38-point jump in MAP@5 accuracy is the joint result of four architectural and training changes introduced in the \textit{EfficientNetB5 and ArcFace Model} compared to \textit{ResNet and ArcMargin Model}. The key factors contributing to this performance are listed below:
+
+\begin{table}
+    \centering
+    \begin{tabular}{ccc}
+         Factor&  ResNet + ArcMargin& EffNetB5 + Elastic ArcFace\\
+         Backbone Capacity&  ResNet-50 at 224 × 224 px& EfficientNet-B5 at 380 × 380 px with compound scaling\\
+         Loss formulation&  Fixed, static ArcMargin& Elastic ArcFace (stochastic margin)\\
+         Data resolution \& Crops&  Single 224 × 224 center crop& Multi-crop pipeline (full-body, detector \& ViT crops)\\
+         Imbalance Mitigation&  None& Class-balanced weights,\\
+    \end{tabular}
+    \caption{Caption}
+    \label{tab:my_label}
+\end{table}
+
+\textbf{1. Backbone capacity and resolution}
+
+ResNet-50 processes 224 x 224 px inputs and relies on uniform down-sampling. Much granular detail contained in images of the Happywhale dataset is lost. However, EfficientNet-B5 paired with "compound scaling" retains fine scar and pigmentation details. Constraining the EfficientNet-B5 to 224 x 224 px reduces the accuracy due to a loss of key features contained in images. 
+
+\textbf{2. Loss Formulation}
+
+ArcMargin uses a fixed angular margin, and classes with a few images fail to cross this set threshold. Elastic ArcFace instead samples the margin from each mini-batch, creating a boundary that adapts to variations within a class. Switching ResNet to Elastic ArcFace is a second cause of a jump in performance between ResNet + ArcMargin and EffNetB5 + Elastic ArcFace.
+
+\textbf{3. Multi-crop augmentation}
+
+The ResNet baseline employed only flips and changes in color, yet the EfficientNet-B5 model employs full-body, YOLOv5, Detic, or Vision Transformer. This exposes the model to images that only display certain parts of a marine mammal, as well as the full body of the animal. 
+
+\textbf{Imbalance Mitigation}
+
+Happywhale is heavily skewed (9,664 images for \texttt{bottlenose_dolphin} vs. 14 for \texttt{frasier's dolphin}). The EfficientNetB5/ArcFace model mitigated the effects of this by utilizing an ArcFace loss function, minority oversampling, and other methods. 
+
 \subsection{Blend of Models}
 
-The final model utilized an ensemble of 30 independently-trained models. All members are variants of Efficient-NetB5 that differ in input resolution, data-augumentation pipeline, and crop strategy. Five of them are "specialists" that are trained on beluga-only, full-body, or back-fin crops that work to extract features from ambiguities that generic models often miss.
+The final model utilized an ensemble of 30 independently-trained models. All members are variants of Efficient-NetB5 that differ in input resolution, data-augmentation pipeline, and crop strategy. Five of them are "specialists" that are trained on beluga-only, full-body, or back-fin crops that work to extract features from ambiguities that generic models often miss.
 
 For every image, each component returns its top-5 individual IDs. Let $r_{ij}!\in!{0,\dots,4}$ be the rank assigned by model $j$ to identity~$i$. Ranks are converted to scores through a fixed, monotone lookup $w(r)={10,6.5,3.3,2.9,2.7}$. The ensemble score for identity $i$ is a weighted sum of rank-based scores.
 
@@ -476,7 +509,7 @@ The frequency penalty $0.033 f_i$ mitigates the effects of common whales being p
 
 The 30 coefficients ${\alpha}$ were learned with a 5-fold cross-validation split that keeps every whale's images in a single fold. Starting from $\alpha_j = 1$ for each model, a coordinate-wise search was run. We tested each model weight one at a time: we made each weight slightly bigger and smaller by 0.1 while keeping all other weights the same. We kept a change in weight if it improved our MAP@5 score by at least $10^{-3}$. Going through and testing every single weight in this way is how this model is optimized.
 
-The best single checkpoint (ArcFace with EfficientNet‑B5, 768‑px) attains a MAP@5 score of 0.854. Utilizings its predictions in the ensemble lifts the MAP@5 score to 0.882 on  out-of-fold predictions. On Kaggle's public leaderboard, the same blend scored 0.8806.
+The best single checkpoint (ArcFace with EfficientNet‑B5, 768‑px) attains a MAP@5 score of 0.854. Utilizing its predictions in the ensemble lifts the MAP@5 score to 0.882 on  out-of-fold predictions. On Kaggle's public leaderboard, the same blend scored 0.8806.
 
 \subsection{Key Learnings}
 
