@@ -140,13 +140,17 @@ Our approach to handling the severe class imbalance combines several complementa
 
 \subsection{Training Strategy}
 
-Training occurred on a Tensor Processing Unit on Google Cloud, significantly speeding up training times for this model and using fewer local resources. The batch size is set to 16 * the number of TPU replicas, leveraging Google Cloud’s TPUs. Some methods used to make training more efficient include:
+Training occurred on a Tensor Processing Unit (TPU) on Kaggle, significantly speeding up training times for this model and using fewer local resources. The batch size is set to 16 * the number of TPU replicas, leveraging Kaggle’s TPUs.
 
-\begin{itemize}
-    \item \textbf{Multiple-Sample Dropout: }To improve generalization, multiple-sample dropout is used with different dropout rates on feature embeddings. The outputs are averaged to reduce overfitting while retaining rich feature information\textsuperscript{6}.
-\end{itemize}
+\paragraph{Runtime Benchmarks}
 
-The multi-sample dropout technique was used alongside with our learning rate schedule to increase the stability of the model's training. During the initial 5 epochs of training, dropout rates were maintained at 0.1 to preserve gradient flow. As the learning rate peaked and began decreasing, the dropout rates increased to 0.2-0.3 to further improve the model during later epochs. These changes in dropout rates prevents overfitting during phases with high learning rates while ensuring that ciritcal features are not lost.
+On Kaggle, the EfficientNetB5 + ArcFace notebook finished all 30 training epochs in 1 hour 15 minutes on a single TPU v3-8 instance.
+On the other hand, running the same code adapted for Kaggle's NVIDIA P100 16 GB GPU required 4 h 7 minutes.
+Therefore, the TPU accelerator devlivers about a 3.3 fold increase for this workload, showcasing the benefits of  TPU usage over GPUs.
+
+\paragraph{Free Research Tier}
+
+Kaggle grants every user up to 9 hours a day of TPU v3-8 usage at zero cost\textsuperscript{https://www.kaggle.com/docs/tpu}, so all experiments required in this study were conducted free of charge.
 
 \subsection{K-Nearest-Neighbor Head}
 
@@ -402,8 +406,7 @@ The resulting images shown below highlight the pixels that affected the predicti
   \includegraphics[width=0.32\linewidth]{gradcam_dusky_dolphin.jpg}
   \includegraphics[width=0.32\linewidth]{gradcam_humpback_whale.jpg}
   \includegraphics[width=0.32\linewidth]{gradcam_beluga.jpg}
-  \caption{Grad-CAM overlays for three validation
-  images.  The network focuses on physical cues on parts of the marine animals, and is resistant to noise and distractions in the backgrounds of images. First, a \texttt{dusky_dophin} is displayed, with a focus on the dorsal fin. Next, a \texttt{humpback whale}'s dorsal fin and upper body is displayed. Finally, a \texttt{beluga}'s forehead, or melon, is shown.}
+  \caption{Grad-CAM overlays for three validation images.  The network focuses on physical cues on parts of the marine animals, and is resistant to noise and distractions in the backgrounds of images. First, a \texttt{dusky_dolphin} is displayed, with a focus on the dorsal fin. Next, a \texttt{humpback whale}'s dorsal fin and upper body is displayed. Finally, a \texttt{beluga}'s forehead, or melon, is shown.}
   \label{fig:gradcam_examples}
 \end{figure}
 
@@ -413,7 +416,7 @@ To quantitatively assess the model to real-world variances in imaging conditions
 
 Results showed a reasonable degradation in performance:
  \begin{itemize}
-     \item A moderate blur (σ = 1.0) reduced the MAP@5 from 0.86 to 0.76
+     \item A moderate blur (\σ = 1.0)\ reduced the MAP@5 from 0.86 to 0.76
      \item A severe blur (σ = 2.0) on validation images dropped the MAP@5 from 0.86 to 0.69
      \item Low-light conditions (60\% of original brightness) reduced the MAP@5 from 0.86 to 0.80
      \item A moderate blur (σ = 1.0) and low-light conditions (60\% of original brightness) reduced the MAP@5 to 0.7.
@@ -423,7 +426,7 @@ This model demonstrates strong resilience to brightness variations, likely due t
 
 \subsection{Misclassification Analysis}
 
-Most mistakes made by the EfficientNetB5 & ArcFace model resulted when two separate species were visually similar. For example, the Bottlenose and Spinner dolphins had large amounts of training data, however they were misclassified due to visual similarity and image quality. 
+Most mistakes made by the EfficientNetB5 \& ArcFace model resulted when two separate species were visually similar. For example, the Bottlenose and Spinner dolphins had large amounts of training data, however they were misclassified due to visual similarity and image quality. 
 
 Errors in classification also commonly occurred when the visual evidence of a given species is thin. For example, the Fraser's and or Pygmy Killer Whale low accuracy relative to other classes, despite measures taken to reduce the effects of a limited number training data availability.  In addition, images that demonstrate heavy motion blur, back lighting, or a lack of scars  result in errors in classification. Below is a Grad-CAM heatmap of a misclassified image, in which the model focuses on features of the image that are irrelevant to classification:
 \begin{figure}
@@ -503,7 +506,7 @@ The ResNet baseline employed only flips and changes in color, yet the EfficientN
 
 \paragraph{4. Imbalance Mitigation}
 
-Happywhale is heavily skewed (9,664 images for \texttt{bottlenose_dolphin} vs. 14 for \texttt{frasier's dolphin}). The EfficientNetB5/ArcFace model mitigated the effects of this by utilizing an ArcFace loss function, minority oversampling, and other methods. 
+Happywhale is heavily skewed (9,664 images for \texttt{bottlenose_dolphin} vs. 14 for \texttt{fraser's dolphin}). The EfficientNetB5/ArcFace model mitigated the effects of this by utilizing an ArcFace loss function, minority oversampling, and other methods. 
 
 \subsection{Blend of Models}
 
