@@ -560,6 +560,14 @@ At inference time each model outputs its five most-likely individual IDs. These 
 
 This concise overview avoids repeating the optimization mechanics while preserving the high-level rationale, composition, and performance of the ensemble.
 
+\subsection{Dataset Limitations}
+
+While the Happywhale dataset is one of the largest publicly available collections of various marine mammals. However, there are several limitations that affect the model performance and real-world applicability of this dataset. 
+
+The dataset is subject to significant geographic bias, with the majority of reported sightings concentrated in the central and Eastern North Pacific regions such as Hawai'i and Alaska, while areas in the Western Pacific are significantly under sampled due to reduced populations in those areas. This disparity is even more significant in remote areas that are critical for whale populations, such as the Revillagigedo and Aleutian Islands. As a result, models trained using the Happywhale dataset will perform poorly due to less training data on marine mammals in those areas.
+
+Temporal bias is another important consideration. The Happywhale dataset reflects significant fluctuations in sampling intensity over time, with peak image reporting during the 2004-2006 SPLASH project. Image reporting lessened during the COVID-19 pandemic, despite thriving marine mammal populations during this time. 
+
 \subsection{Key Learnings}
 
 \begin{enumerate}
