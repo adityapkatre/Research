@@ -240,7 +240,7 @@ By relying on MAP@5, the evaluation ensures that the model does not simply ident
 
 Combining the EfficientNetB5 backbone, ArcFace facial discrimination capabilities and other classification methods results in an effective and comprehensive approach to identifying individual whales and dolphins. The result of this use of creating iterations of models for the Happywhale dataset is a model capable of achieving high MAP@5 scores with fine-grained mammal identification tasks.
 
-Throughout this paper we report Mean Average Precision at 5, the official Happywhale competition metric. Unlike simple classification accuracy, which only counts whether a prediction is correct, MAP@5 rewards models that place the correct individual among the top five ranked predictions, with higher weigths awarded for higher ranks. All leaderboard values such as "0.88" refer to MAP@5 scores, not accuracy.
+Throughout this paper we report Mean Average Precision at 5, the official Happywhale competition metric. Unlike simple classification accuracy, which only counts whether a prediction is correct, MAP@5 rewards models that place the correct individual among the top five ranked predictions, with higher weigths awarded for higher ranks. All leaderboard values such as "0.88" refer to MAP@5 scores, not accuracy. In addition, these scores refer to public scores on Kaggle's Happywhale leaderboard, which is comprised of about 24\% of the testing data.
 
 \section{Results}
 
@@ -451,6 +451,10 @@ MAP@5 & 88.6\% ± 0.4 & [88.3\%, 88.9\%] & 88.1\%-89.2\% \\ \hline
 \end{table}
 
 By measuring performance variability using standard deviation and confidence interval computations and proving metric stability across several data partitions, our findings meet the requirement for statistical validation. The reliability of our model's predictions across folds is further supported by the non-parametric Wilcoxon test. 
+
+\subsection{Comparison with other Happywhale Leaderboard Models}
+
+The Kaggle Happywhale - Whale \& Dolphin Identification challenge attracted a total of 1,588 teams, and the Private Leaderboard, which is comprised of about 76\% of the test data, is used to create the final standings for the competition. The "Preferred Dolphin" team attained the highest competition-wide Private Score of 0.876. The blend of models attained a Private Score of 0.831. This model is ranked 76, placing it higher than about 95.12\% of competitors. \textsuperscript{https://www.kaggle.com/competitions/happy-whale-and-dolphin/leaderboard}
 
 \section{Discussion}
 
