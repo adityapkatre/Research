@@ -154,21 +154,25 @@ Kaggle grants every user up to 9 hours a day of TPU v3-8 usage at zero cost\text
 
 \subsection{K-Nearest-Neighbor Head}
 
-A soft-max layer assumes a closed set of labels, yet about 10\% of Happywhale test images belong to individuals not present in the training dataset. A KNN head supports this open-set scenario. If no neighbor is sufficiently close we assign a given image the label \texttt{new_individual}\textsuperscript{7}.
+A soft-max layer assumes a set of labels, yet about $\sim$10 \% of Happywhale test images belong to individuals not present in the training dataset. The KNN head is primarily used in the EfficientNetB5 + ArcFace model.
+
+After the CNN produces a 512-dimensional feature vector, a $k$-Nearest-Neighbor (KNN) search is used to decide the final label\textsuperscript{7}.
 
 For each query to the KNN head, the model performs four steps:
 \begin{enumerate}
     \item Run the image through the CNN and take the 512-dimensional feature vector that is generated right before the ArcFace head.
-    \item Normalize the vector by dividing it by its own magnitude. As a result the vector will have unit length, or a vector of 1. This results in the dot-product of two vectors being equal to their cosine similarity.
-    \item Use \texttt{scikit-learn}'s \texttt{NearestNeighbors} to find the &k& closest training vectors. This takes about 14 milliseconds on a single CPU core.
-    \item Finally, the KNN head counts how many times each label appears among its neighbors.  The label that appears the most commonly is the prediction. If a tie occurs, the label with the shortest inverse distance is chosen.\\
+    \item Normalize the vector by dividing it by its own magnitude. As a result the vector will have a vector of 1. This results in the dot-product of two vectors being equal to their cosine similarity.
+    \item Use cosine distance to fetch the $k=50$ closest training embeddings.
+    \item Use \texttt{scikit-learn}'s \texttt{NearestNeighbors} to find the k closest training vectors. This takes about 14 milliseconds on a single CPU core.
+    \item Finally, the KNN head counts how many times each label appears among its neighbors.  The label that appears the most commonly is the prediction. If a tie occurs, the label with the shortest inverse distance is chosen.
+    \item If the nearest neighbor has a cosine distance greater than $0.62$, we output the special label \texttt{new_individual}. The cosine distance of 0.62 was chosen because it maximized MAP@5 by accurately assigning the \texttt{new_individual} label.
 \end{enumerate}
 
 \subsection{Hyper-parameter selection for $k$}
 
 A grid search on the validation fold with $k\!=\!1,3,5,10,20,50,75,100$ shows performance peaking at $k=50$. 
 
-$k=50$ was chosen because smaller values resulted in instability among minority classes, and larger values added distractors.
+$k=50$ was chosen because smaller values resulted in instability among minority classes, and larger values added distractors to predictions.
 
 \subsection{Distance-based thresholds for \texttt{new_individual}}
 
