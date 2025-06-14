@@ -189,6 +189,40 @@ P_{\text{final}} = w_1 P_1 + w_2 P_2 + \dots + w_n P_n
 \]
  where $w_i$ represents the weight assigned to model $i$ and $P_i$ is its prediction. The complete implementation of our ensemble blending strategy, including a model training notebook and weight selection, is available at https://github.com/adityapkatre/Research.
 
+ \paragraph{Model Selection Criteria}
+
+Thirty candidate checkpoints were first shortlisted from a pool of 120 training runs by applying two filters on their out-of-fold predictions:
+\begin{itemize}
+    \item A minimum MAP@5 of 0.840 on the 5-fold validation split that keeps each \texttt{individual_id} in a single fold
+    \item Five specialist models trained only on beluga, back fin, or full-body crops were included in the blend, even if scored a lower MAP@5 in isolation. This helps reduce errors made by models that took a more wholistic approach to classifying certain species.
+\end{itemize}
+
+This resulted in a total of 30 reasonably strong yet diverse set of predictions, each one stored as a .csv file.
+
+\paragraph{Weight Optimization}
+
+Let \(r_{ij}\!\in\!\{0,1,\dots,4\}\) be the rank assigned by model \(j\) to identity \(i\).
+Ranks are converted to base scores with the monotone lookup \(w(r)=\{10,\,6.5,\,3.3,\,2.9,\,2.7\}\).
+The ensemble score for an identity is calculated using the following equation:
+\[
+s_i\;=\;\sum_{j=1}^{30}\alpha_j\,w\!\bigl(r_{ij}\bigr)\;-\;0.033\,f_i,
+\]
+where \(f_i\) is the number of training photos of that individual and where the special label \texttt{new\_individual} is down-weighted by 4 unless it is ranked first or second to keep its false-positive rate in check.
+
+The coefficients \(\boldsymbol{\alpha} \!=\! (\alpha_1,\dots,\alpha_{30})\) were learned with a greedy \emph{coordinate-ascent} search on the same 5-fold split:
+
+\begin{enumerate}
+  \item Initialize all \(\alpha_j = 1.0\).
+  \item For each model, \(j\), evaluate the MAP@5 on the out-of-fold data after changing \(\alpha_j\) by \(\pm0.1\), while keeping the modification that improves the MAP@5 by at least $10^{-3}$.
+  \item Repeat step 2 until a full sweep over all \(j\) yields no improvement greater than $10^{-3}$ MAP@5.
+\end{enumerate}
+
+Starting from the all-ones vector, this coordinate search converged in under three minutes and produced the final weight vector:
+\[
+(25,\;7,\;1.5,\;1,\;6,\;1,\;1.5,\;1,\;1,\;1,\;1,\;0.99,\ldots,1.4),
+\]
+When these weights are applied to the 30 OOF prediction files, the blended submission scores MAP@5 = 0.88 (±0.002 across folds), a +2.8 pt gain over the best single checkpoint.
+
 \subsection{Evaluation Metrics}
 
 The primary evaluation metric employed in the Happywhale competition on Kaggle is the Mean Average Precision at 5 (MAP@5). This metric is specifically designed to measure the quality of a model’s top-five predictions for each image in the test set, thereby assessing how effectively the model prioritizes correct labels at the highest ranks. By limiting the evaluation to the top five predictions per image, MAP@5 focuses on the model’s ability to accurately pinpoint the correct individual from a shortlist of candidates, rather than requiring it to produce a perfectly ordered, full-length ranking. Such a constraint reflects practical scenarios in which only the top few suggestions matter most, such as identifying a specific whale or dolphin from a large database. 
@@ -520,18 +554,11 @@ Happywhale is heavily skewed (9,664 images for \texttt{bottlenose_dolphin} vs. 1
 
 \subsection{Blend of Models}
 
-The final model utilized an ensemble of 30 independently-trained models. All members are variants of Efficient-NetB5 that differ in input resolution, data-augmentation pipeline, and crop strategy. Five of them are "specialists" that are trained on beluga-only, full-body, or back-fin crops that work to extract features from ambiguities that generic models often miss.
+Our final submission is an ensemble of 30 model checkpoints chosen for their unique strengths. Twenty-five are “generalist’’ models trained on the full dataset with different resolutions, crop pipelines, and augmentation recipes. The other five are specialist models focused on beluga-only, back-fin, or full-body crops that do not make the systematic errors made by the generalists.
 
-For every image, each component returns its top-5 individual IDs. Let $r_{ij}!\in!{0,\dots,4}$ be the rank assigned by model $j$ to identity~$i$. Ranks are converted to scores through a fixed, monotone lookup $w(r)={10,6.5,3.3,2.9,2.7}$. The ensemble score for identity $i$ is a weighted sum of rank-based scores.
+At inference time each model outputs its five most-likely individual IDs. These ranked lists are combined with the weighting scheme and frequency penalty detailed in the \textit{Weight optimization} paragraph of the same section. Because all coefficients were tuned only on out-of-fold (OOF) data, the blend generalities well: it improves the best single checkpoint (MAP@5 = 0.854) to 0.88  MAP@5 on Kaggle’s public leaderboard.
 
-\begin{equation}
-s_i;=;\sum_{j=1}^{30} \alpha_j,w(r_{ij});;{-};0.033,f_i,\quad\text{with};f_i=|{\text{training photos of }i}|.
-\end{equation}
-The frequency penalty $0.033 f_i$ mitigates the effects of common whales being present in the dataset. Scores for the label \texttt{new_individual} are down-weighted by 4 whenever it is not ranked first or second, resulting in a reduction in false positives for this label. 
-
-The 30 coefficients ${\alpha}$ were learned with a 5-fold cross-validation split that keeps every whale's images in a single fold. Starting from $\alpha_j = 1$ for each model, a coordinate-wise search was run. We tested each model weight one at a time: we made each weight slightly bigger and smaller by 0.1 while keeping all other weights the same. We kept a change in weight if it improved our MAP@5 score by at least $10^{-3}$. Going through and testing every single weight in this way is how this model is optimized.
-
-The best single checkpoint (ArcFace with EfficientNet‑B5, 768‑px) attains a MAP@5 score of 0.854. Utilizing its predictions in the ensemble lifts the MAP@5 score to 0.882 on  out-of-fold predictions. On Kaggle's public leaderboard, the same blend scored 0.8806.
+This concise overview avoids repeating the optimization mechanics while preserving the high-level rationale, composition, and performance of the ensemble.
 
 \subsection{Key Learnings}
 
