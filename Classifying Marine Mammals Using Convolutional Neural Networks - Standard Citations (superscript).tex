@@ -520,16 +520,16 @@ The use of an EfficientNetB5 backbone also boosted the model's performance. The 
 
 The data augmentation was also improved in the EfficientNetB5 and ArcFace Model, using grayscale transformations, color adjustments, and random cropping. The use of these techniques reduced the likelihood of overfitting. Additionally, employing k-fold cross-validation ensured that the model would generalize well against unseen data. 
 
-\subsection{Performance Gap between ResNet + ArcMargin and EffNetB5 + Elastic ArcFace}
+\subsection{Performance Gap between ResNet + ArcMargin and EffNetB5 + ArcFace}
 
 The 38-point jump in MAP@5 accuracy is the joint result of four architectural and training changes introduced in the \textit{EfficientNetB5 and ArcFace Model} compared to \textit{ResNet and ArcMargin Model}. The key factors contributing to this performance are listed below:
 
 \begin{table}
     \centering
     \begin{tabular}{ccc}
-         Factor&  ResNet + ArcMargin& EffNetB5 + Elastic ArcFace\\
+         Factor&  ResNet + ArcMargin& EffNetB5 +  ArcFace\\
          Backbone Capacity&  ResNet-50 at 224 × 224 px& EfficientNet-B5 at 380 × 380 px with compound scaling\\
-         Loss formulation&  Fixed, static ArcMargin& Elastic ArcFace (stochastic margin)\\
+         Loss formulation&  Fixed, static ArcMargin&  ArcFace (stochastic margin)\\
          Data resolution \& Crops&  Single 224 × 224 center crop& Multi-crop pipeline (full-body, detector \& ViT crops)\\
          Imbalance Mitigation&  None& Class-balanced weights,\\
     \end{tabular}
@@ -542,7 +542,7 @@ ResNet-50 processes 224 x 224 px inputs and relies on uniform down-sampling. Muc
 
 \paragraph{2. Loss Formulation}
 
-ArcMargin uses a fixed angular margin, and classes with a few images fail to cross this set threshold. Elastic ArcFace instead samples the margin from each mini-batch, creating a boundary that adapts to variations within a class. Switching ResNet to Elastic ArcFace is a second cause of a jump in performance between ResNet + ArcMargin and EffNetB5 + Elastic ArcFace.
+ArcMargin uses a fixed angular margin, and classes with a few images fail to cross this set threshold. ArcFace instead samples the margin from each mini-batch, creating a boundary that adapts to variations within a class. Switching ResNet to ArcFace is a second cause of a jump in performance between ResNet + ArcMargin and EffNetB5 + ArcFace.
 
 \paragraph{3. Multi-crop augmentation}
 
@@ -560,7 +560,7 @@ At inference time each model outputs its five most-likely individual IDs. These 
 
 This concise overview avoids repeating the optimization mechanics while preserving the high-level rationale, composition, and performance of the ensemble.
 
-\subsection{Dataset Limitations}
+\subsection{Model and Dataset Limitations}
 
 While the Happywhale dataset is one of the largest publicly available collections of various marine mammals. However, there are several limitations that affect the model performance and real-world applicability of this dataset. 
 
@@ -585,11 +585,21 @@ While the technical performance of our machine learning model shows some promise
 
 \paragraph{Integration with Photo identification Databases}
 
-Citizen science portals and research archives, such as Flukebook, already contain lists of records for thousands of animal images. In order to effectively utilize the CNN, it can be used in an API that receives an uploaded image, returns the top $k$ identity labels for an image, and stores it alongside labels assigned manually by humans. This light weight integration interferes with a conservationist's workflow minimally while providing benefits.
+Citizen science portals and research archives, such as Flukebook, already contain lists of records for thousands of animal images. In order to effectively utilize the CNN, it can be used in an API that receives an uploaded image, returns the top $k$ identity labels for an image, and stores it alongside labels assigned manually by humans. This lightweight integration minimally interferes with a conservationist's workflow while providing benefits.
 
 \paragraph{Public Engagement and Education}
 
 Embedding the model in a mobile app that allows users to upload images allows whale watchers to obtain instant feedback on which animal they photographed. This mirrors bird identification apps that have increased public participation and raised awareness about ornithology.  In addition, images uploaded to the mobile app may be recoded and used to further improve models, resulting in a positive feedback loop of model improvement and public participation.
+
+\subsection{Comparison with Prior Work}
+
+Existing marine mammal photo identification systems report strong performance on specific tasks. Some examples include: 
+\begin{itemize}
+    \item finFindR, created by Thompson et al. in 2021 achieved an 88\% rank-1 match rate and 97\% rank-50 success on common bottlenose dolphins when evaluated \textsuperscript{https://doi.org/10.1111/mms.12849}
+    \item FIN-PRINT, created by Bergler et al. in 2021 scored 92.5\% top-1 accuracy and 97.2\% top-3 accuracy on 100 frequently photographed killer-whale individuals\textsuperscript{https://www.nature.com/articles/s41598-021-02506-6}
+\end{itemize}
+
+Our ensemble achieves 0.88 MAP@5 (public) and 0.831 MAP@5 (private), ranking 70 out of 1,588 teams. Although the evaluation metrics performed are different, the results show that our multi-species classification model has lower accuracy but stronger generalization accross the 30 species presented in the Happywhale dataset.
 
 \section{Conclusion}
 
