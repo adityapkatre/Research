@@ -512,13 +512,9 @@ The use of the ArcMargin loss function increased the discriminative power of the
 
 However, the model's performance plateaued due to certain restrictions on the training strategy and data. In this model, the ArcMargin loss function improved the separation between classes, but it was not an optimal solution for every class in the Happywhale dataset, which contained an imbalance across various species of marine mammals. Additionally, the data processing techniques in this model were relatively basic, resulting in the model's inability to adapt to the real-world variances presented in the dataset.
 
-\subsection{EfficientNetB5 and ArcFace Model}
+\textbackslash{}subsection\{EfficientNetB5 and ArcFace Model\} The EfficientNetB5 and ArcFace Model demonstrated a significant performance leap compared to previous models, achieving a MAP@5 score of 0.86. The ArcFace function increased distinctions between marine mammal classes by adding angular boundaries, allowing the model to better handle slight variations in individual appearance. This is crucial for Happywhale, where images of the same animal can vary due to lighting, pose, color, and environmental conditions, while differences between classes can be subtle.
 
-The EfficientNetB5 and ArcFace Model demonstrated a significant leap in terms of performance compared to models discussed in Sections 5.1 and 5.2, and it earned a MAP@5 score of 0.86. The introduction of the ArcFace function resulted in increased distinctions between classes of marine mammals by adding angular boundaries between classes. This allows the model to better handle slight variations in the appearance of an individual. This is especially crucial for Happywhale, where images of the same animal can vary due to lighting, pose, color, and environmental conditions and differences between classes can be subtle.
-
-The use of an EfficientNetB5 backbone also boosted the model's performance. The backbone's compound scaling strategy helped create a balance between depth, width, and resolution in the Convolutional Neural Network. During training, a higher-quality 380x380 resolution was used, allowing the model to capture and learn from more subtle and intricate details in images.
-
-The data augmentation was also improved in the EfficientNetB5 and ArcFace Model, using grayscale transformations, color adjustments, and random cropping. The use of these techniques reduced the likelihood of overfitting. Additionally, employing k-fold cross-validation ensured that the model would generalize well against unseen data. 
+The EfficientNetB5 backbone's compound scaling strategy balanced depth, width, and resolution in the CNN. Training at 380x380 resolution enabled the model to capture intricate image details. Improved data augmentation techniques including grayscale transformations, color adjustments, and random cropping reduced overfitting likelihood. K-fold cross-validation ensured good generalization to unseen data.
 
 \subsection{Performance Gap between ResNet + ArcMargin and EffNetB5 + ArcFace}
 
