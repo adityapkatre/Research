@@ -50,7 +50,7 @@ The model uses EfficientNetB5 as its backbone. EfficientNetB5 is a convolutional
 \begin{enumerate}
     \item \textbf{Depth Scaling:} This increases the depth of training data, allowing the model to learn subtle patterns in images. This enables the model to learn from more complex, layered data. However, overusing this method may lead to higher computational demands and a decline in efficiency.
     \item \textbf{Width Scaling:} This method of scaling adds more neurons to each layer of the model, expanding its width. As a result, the CNN can learn more nuanced patterns in data. Depth and width scaling work in harmony to effectively extract features from data.
-    \item \textbf{Resolution Scaling:} The EfficientNetB5 model scales images in a balanced manner, ensuring that images are high-quality and that nuanced features can be extracted while maintaining a decent level of computational demand.\textsuperscript{4}.
+    \item \textbf{Resolution Scaling:} The EfficientNetB5 model scales images in a balanced manner, ensuring that images are high-quality and that nuanced features can be extracted while maintaining a decent level of computational demand\textsuperscript{4}.
 \end{enumerate}
 
 The ArcFace loss layer is introduced as the classification head for this model. ArcFace increases the separation between different classes, improving the model’s ability to distinguish images. It achieves this by introducing Additive Angular Margin Loss to the feature vectors. This additional margin in ArcFace creates a more robust distinction between image classes. This enhanced the model’s discriminative learning and accuracy in identifying images across a large subset of classes. The loss layer operates by normalizing each feature and then using a cosine similarity metric for each feature. Then, ArcFace makes it easier to distinguish between classes by adding a fixed angle, or angular margin, between the feature vector and the target class. This contributes to making class boundaries more distinct, enforcing a distinct separation between classes\textsuperscript{5}.
@@ -489,7 +489,7 @@ By measuring performance variability using standard deviation and confidence int
 
 \subsection{Comparison with other Happywhale Leaderboard Models}
 
-The Kaggle Happywhale - Whale \& Dolphin Identification challenge attracted a total of 1,588 teams, and the Private Leaderboard, which is comprised of about 76\% of the test data, is used to create the final standings for the competition. The "Preferred Dolphin" team attained the highest competition-wide Private Score of 0.876. The model blend attained a Private Score of 0.831. This model is ranked 76, placing it higher than about 95.12\% of competitors. \textsuperscript{11}
+The Kaggle Happywhale - Whale \& Dolphin Identification challenge attracted a total of 1,588 teams, and the Private Leaderboard, which is comprised of about 76\% of the test data, is used to create the final standings for the competition. The "Preferred Dolphin" team attained the highest competition-wide Private Score of 0.876. The model blend attained a Private Score of 0.831. This model is ranked 76, placing it higher than about 95.12\% of competitors\textsuperscript{11}.
 
 \section{Discussion}
 
@@ -594,8 +594,8 @@ Embedding the model in a mobile app that allows users to upload images to the cl
 
 Existing marine mammal photo-identification systems consistently report strong performance on specific tasks. Some examples include: 
 \begin{itemize}
-    \item finFindR, created by J. Thompson et al. in 2021 achieved an 88\% rank-1 match rate and 97\% rank-50 success on common bottlenose dolphins when evaluated \textsuperscript{18}
-    \item FIN-PRINT, created by C. Bergler et al. in 2021 scored 92.5\% top-1 accuracy and 97.2\% top-3 accuracy on 100 frequently photographed killer-whale individuals\textsuperscript{19}
+    \item finFindR, created by J. Thompson et al. in 2021 achieved an 88\% rank-1 match rate and 97\% rank-50 success on common bottlenose dolphins when evaluated \textsuperscript{18}.
+    \item FIN-PRINT, created by C. Bergler et al. in 2021 scored 92.5\% top-1 accuracy and 97.2\% top-3 accuracy on 100 frequently photographed killer-whale individuals\textsuperscript{19}.
 \end{itemize}
 
 Our ensemble achieves 0.88 MAP@5 (public) and 0.831 MAP@5 (private), ranking 70 out of 1,588 teams. Although the evaluation metrics performed are different, the results show that our multi-species classification model has lower accuracy but stronger generalization across the 30 species presented in the Happywhale dataset.
@@ -610,7 +610,6 @@ Beyond its immediate application, this research contributes to the field of wild
 
 From a broader perspective, the findings in this study show the practicality and importance of implementing deep learning solutions to monitor wildlife and draw inferences on carrying capacity, food webs, and other related aspects. The use of machine learning also provides an instant mechanism to support ecological studies and inform conservation programs. This research demonstrates how machine learning helps bridge the gap between technology and environmental science, proving to be a vital tool for preserving marine ecosystems for future generations. The approaches utilized and the lessons learned during this study pave the way for broader adoption of Machine Learning in ecological research. 
 
-\section{References}
 \section{References}
 
 1. K.\,N. Shivaprakash, N. Swami, S. Mysorekar, R. Arora, A. Gangadharan, K. Vohra, M. Jadeyegowda, J.\,M. Kiesecker. Potential for artificial intelligence (AI) and machine learning (ML) applications in biodiversity conservation, managing forests, and related services in India. \textit{Sustainability}. \textbf{14}, 7154 (2022).
