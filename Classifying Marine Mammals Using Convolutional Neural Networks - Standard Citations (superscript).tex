@@ -9,6 +9,7 @@
 \usepackage{url}
 \usepackage{float}
 \usepackage{authblk}
+\usepackage{array}
 
 \title{Classifying Marine Mammals Using Convolutional Neural Networks}
 \author[1]{Aditya Katre}
@@ -78,7 +79,7 @@ Kaggle’s Happywhale dataset is split into training and testing sets. A CSV fil
 
 \subsection{Data Splitting and Leakage Prevention}
 
-Kaggle distributes the dataset in two completely separate folders in the Happywhale competition. The first, \texttt{train\_images/}, is accompanied by a \texttt{train.csv} file that lists the species and \texttt{individual_id} for every training photo. The second, \texttt{test_images/}, contains unlabeled images. While some individuals that appear in the test set can be absent in the training data, no image in the training folder is duplicated in the test folder. This organizer-enforced separation and organization of images eliminates the risk of leakage between the two data folders.  
+Kaggle distributes the dataset in two completely separate folders in the Happywhale competition. The first, \texttt{train\_images/}, is accompanied by a \texttt{train.csv} file that lists the species and \texttt{individual\_id} for every training photo. The second, \texttt{test\_images/}, contains unlabeled images. While some individuals that appear in the test set can be absent in the training data, no image in the training folder is duplicated in the test folder. This organizer-enforced separation and organization of images eliminates the risk of leakage between the two data folders.  
 
 \subsection{Class Imbalance Analysis}
 
@@ -164,7 +165,7 @@ For each query to the KNN head, the model performs four steps:
     \item Use cosine distance to fetch the $k=50$ closest training embeddings.
     \item Use \texttt{scikit-learn}'s \texttt{NearestNeighbors} to find the k closest training vectors. This takes about 14 milliseconds on a single CPU core.
     \item Finally, the KNN head counts how many times each label appears among its neighbors.  The label that appears the most commonly is the prediction. If a tie occurs, the label with the shortest inverse distance is chosen.
-    \item If the nearest neighbor has a cosine distance greater than $0.62$, we output the special label \texttt{new_individual}. The cosine distance of 0.62 was chosen because it maximized MAP@5 by accurately assigning the \texttt{new_individual} label.
+    \item If the nearest neighbor has a cosine distance greater than $0.62$, we output the special label \texttt{new\_individual}. The cosine distance of 0.62 was chosen because it maximized MAP@5 by accurately assigning the \texttt{new\_individual} label.
 \end{enumerate}
 
 \subsection{Hyper-parameter selection for $k$}
@@ -173,25 +174,25 @@ A grid search on the validation fold with $k\!=\!1,3,5,10,20,50,75,100$ shows pe
 
 $k=50$ was chosen because smaller values resulted in instability among minority classes, and larger values added distractors to predictions.
 
-\subsection{Distance-based thresholds for \texttt{new_individual}}
+\subsection{Distance-based thresholds for \texttt{new\_individual}}
 
 Let $d_{(1)}$ be the distance to the closest neighbor and define a confidence $c = 1 - d_{(1)}$.
 A grid search found that if $c < 0.38$ the safest choice is to output the special label \texttt{new\_individual}.
-This allowed a balance between false positives of assigning the label \texttt{new_individual} to an image while ensuring this label is not overused.
+This allowed a balance between false positives of assigning the label \texttt{new\_individual} to an image while ensuring this label is not overused.
 
 \subsection{Ensemble and Blending}
 
 The final model predictions are generated using a blending strategy that combines the performances of multiple models, which range across several different epochs and crop augmentations. Snapshots were also taken and used throughout the model's training. These checkpoints were combined using optimized weights to enhance the model's performance. Optimized weights were also used for each model in the ensemble to ensure that the score produced by the ensemble is maximized\textsuperscript{10}. The following equation represents this:
-\begin{equation}
+\begin{equation*}
 P_{\text{final}} = w_1 P_1 + w_2 P_2 + \dots + w_n P_n
-\end{equation}
+\end{equation*}
  where $w_i$ represents the weight assigned to model $i$ and $P_i$ is its prediction. The complete implementation of our ensemble blending strategy, including a model training notebook and weight selection, is available at https://github.com/adityapkatre/Research.
 
  \paragraph{Model Selection Criteria}
 
 Thirty candidate checkpoints were first shortlisted from a pool of 120 training runs by applying two filters on their out-of-fold predictions:
 \begin{itemize}
-    \item A minimum MAP@5 of 0.840 on the 5-fold validation split that keeps each \texttt{individual_id} in a single fold
+    \item A minimum MAP@5 of 0.840 on the 5-fold validation split that keeps each \texttt{individual\_id} in a single fold
     \item Five specialist models trained only on beluga, back fin, or full-body crops were included in the blend, even if they scored a lower MAP@5 in isolation. This helps reduce errors made by models that took a more holistic approach to classifying certain species.
 \end{itemize}
 
@@ -202,9 +203,9 @@ This resulted in a total of 30 reasonably strong yet diverse sets of predictions
 Let \(r_{ij}\!\in\!\{0,1,\dots,4\}\) be the rank assigned by model \(j\) to identity \(i\).
 Ranks are converted to base scores with the monotone lookup \(w(r)=\{10,\,6.5,\,3.3,\,2.9,\,2.7\}\).
 The ensemble score for an identity is calculated using the following equation:
-\begin{equation}
+\begin{equation*}
 s_i\;=\;\sum_{j=1}^{30}\alpha_j\,w\!\bigl(r_{ij}\bigr)\;-\;0.033\,f_i,
-\end{equation}
+\end{equation*}
 where \(f_i\) is the number of training photos of that individual, and where the special label \texttt{new\_individual} is down-weighted by 4 unless it is ranked first or second to keep its false-positive rate in check.
 
 The coefficients \(\boldsymbol{\alpha} \!=\! (\alpha_1,\dots,\alpha_{30})\) were learned with a greedy \emph{coordinate-ascent} search on the same 5-fold split:
@@ -216,10 +217,10 @@ The coefficients \(\boldsymbol{\alpha} \!=\! (\alpha_1,\dots,\alpha_{30})\) were
 \end{enumerate}
 
 Starting from the all-ones vector, this coordinate search converged in under three minutes and produced the final weight vector:
-\begin{equation}
-(25,\;7,\;1.5,\;1,\;6,\;1,\;1.5,\;1,\;1,\;1,\;1,\;0.99,\ldots,1.4),
-\end{equation}
-When these weights are applied to the 30 OOF prediction files, the blended submission scores MAP@5 = 0.88 (±0.002 across folds), a +2.8 pt gain over the best single checkpoint.
+\begin{equation*}
+(25,\;7,\;1.5,\;1,\;6,\;1,\;1.5,\;1,\;1,\;1,\;1,\;0.99,\ldots,1.4)
+\end{equation*}
+When these weights are applied to the 30 OOF prediction files, the blended submission scores MAP@5 = 0.88 (±0.002 across folds), a +2.8 point gain over the best single checkpoint.
 
 \subsection{Model Architectures and Code Excerpts}
 
@@ -293,13 +294,13 @@ def get_model():
         return model,embed_model
 \end{lstlisting}
 \end{minipage}
-\caption{Python function \texttt{get_model()}, which builds the training network. It adds a batch normalization, dropout, and a 512-D dense layer before compiling with Adam, specifying a learning rate, and ensuring that the top-5 accuracy metrics are provided.}
+\caption{Python function \texttt{get\_model()}, which builds the training network. It adds a batch normalization, dropout, and a 512-D dense layer before compiling with Adam, specifying a learning rate, and ensuring that the top-5 accuracy metrics are provided.}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\linewidth]{learning.png}
-    \caption{Learning rate schedule employed during model training. The x-axis represents training epochs (0-30), and the y-axis represents the learning rate (×10⁻⁵). The graph displays three separate phases of training: (1) warm-up phase (epochs 0-6) with an almost linear increase from 1×10⁻⁶ to 8×10⁻⁵, (2) brief sustain phase at maximum learning rate, and (3) exponential decay phase (epochs 6-30) that ultimately reaches 1×10⁻⁶. The schedule increases stability of initial training while preventing overfitting in later epochs, allowing the model to be more fit for real-world scenarios represented in the dataset.}
+    \includegraphics[width=1\linewidth]{learning.png}
+    \caption{Learning rate schedule employed during model training. The x-axis represents training epochs (0-30), and the y-axis represents the learning rate (x10\textsuperscript{-5}). The graph displays three separate phases of training: (1) warm-up phase (epochs 0-6) with an almost linear increase from 1x10\textsuperscript{-6} to 8x10\textsuperscript{-5}, (2) brief sustain phase at maximum learning rate, and (3) exponential decay phase (epochs 6-30) that ultimately reaches 1x10\textsuperscript{-6}. The schedule increases stability of initial training while preventing overfitting in later epochs, allowing the model to be more fit for real-world scenarios represented in the dataset.}
 \end{figure}
 
 The graph illustrates a learning rate schedule employed during the training process of the model with an EfficientNetB5 backbone. After a brief warm-up phase, the learning rate rises sharply to a peak, the gradually decreases as training progresses. The learning rate (y-axis) initially follows a warm-up phase, which is quickly followed by a peak. As the number of epochs (x-axis) increases, the learning rate gradually decays, which results in the optimization of the model. 
@@ -331,15 +332,15 @@ Additionally, MAP@5 is applied consistently to both validation and test sets, en
 To define MAP@5 more concretely, let \( U \) be the total number of images in the test (or validation) set, and for each image, assume the model produces \( n \) predicted labels ranked from most to least likely. The value \( k \) represents the position (or cutoff) in the ranked list, with \( k \in \{1, 2, 3, 4, 5\} \), since we only consider the top five predictions. For each image \( u \in \{1, 2, \ldots, U\} \), we denote its correct label as a “relevant” item. The model’s task is to place this relevant label as high as possible among its predicted labels. 
 
 We define a relevance function \( \text{rel}(k) \), which equals 1 if the correct label is found at rank \( k \) and 0 otherwise. The precision at cutoff \( k \), denoted \( P(k) \), is computed as the fraction of correct labels among the top \( k \) predictions:
-\begin{equation}
+\begin{equation*}
 P(k) = \frac{\text{Number of relevant labels in top } k}{k}.
-\end{equation}
+\end{equation*}
 Since only one correct label exists per image (under the assumption that each image corresponds to a single individual), any rank \( k \) beyond the first occurrence of the correct label does not contribute additional precision improvements.
 
 The MAP@5 metric is then calculated by summing the precision values at each cutoff \( k \) where the correct label is found and then averaging this quantity across all images. Formally, if we let \( n \) be the number of predictions for each image, and consider only up to \( \min(n, 5) \) predictions for MAP@5, the formula can be expressed as:
-\begin{equation}
+\begin{equation*}
 \text{MAP@5} = \frac{1}{U} \sum_{u=1}^{U} \sum_{k=1}^{\min(n, 5)} \text{rel}(k) \cdot P(k).
-\end{equation}
+\end{equation*}
 In this formula, \(U\) represents the number of images, \(P(k)\) represents the precision at cutoff \(k\), \(n\) is the number of predictions per image, and \(rel(k)\) indicates whether the item at rank \(k\) is a correct label if the item is an incorrect label, the \(rel(k)\) is set to zero.
 
 Once an image is labeled correctly, it's marked as "found" and is no longer considered in the evaluation. On the other hand, if the model predicts the correct label multiple times in a row for a given image, only the first prediction counts for the \(MAP@5\) evaluation, and the rest are dropped.
@@ -442,20 +443,20 @@ The resulting images, shown below, highlight the pixels that most affected the p
   \includegraphics[width=0.32\linewidth]{gradcam_dusky_dolphin.jpg}
   \includegraphics[width=0.32\linewidth]{gradcam_humpback_whale.jpg}
   \includegraphics[width=0.32\linewidth]{gradcam_beluga.jpg}
-  \caption{Grad-CAM overlays for three validation images.  The network focuses on physical cues on parts of the marine animals, and is resistant to noise and distractions in the backgrounds of images. First, a \texttt{dusky_dolphin} is displayed, with a focus on the dorsal fin. Next, a \texttt{humpback whale}'s dorsal fin and upper body is displayed. Finally, a \texttt{beluga}'s forehead, or melon, is shown.}
+  \caption{Grad-CAM overlays for three validation images.  The network focuses on physical cues on parts of the marine animals, and is resistant to noise and distractions in the backgrounds of images. First, a \texttt{dusky\_dolphin} is displayed, with a focus on the dorsal fin. Next, a \texttt{humpback whale}'s dorsal fin and upper body is displayed. Finally, a \texttt{beluga}'s forehead, or melon, is shown.}
   \label{fig:gradcam_examples}
 \end{figure}
 
 \subsection{Model Robustness to Image Quality Degradation}
 
-To quantitatively assess the model's performance in real-world imaging conditions, we systematically evaluated its performance under controlled image quality degradations. A subset of 500 validation images provided by the Happywhale competition was processed with varying levels of Gaussian blur (σ = 0.5, 1.0, 2.0 ) and brightness reduction (reduction of 70\%, 60\%, 50\%). This simulates real-world variances commonly seen in images.
+To quantitatively assess the model's performance in real-world imaging conditions, we systematically evaluated its performance under controlled image quality degradations. A subset of 500 validation images provided by the Happywhale competition was processed with varying levels of Gaussian blur ($\sigma$ = 0.5, 1.0, 2.0 ) and brightness reduction (reduction of 70\%, 60\%, 50\%). This simulates real-world variances commonly seen in images.
 
 Results showed a reasonable degradation in performance:
  \begin{itemize}
-     \item A moderate blur (\σ = 1.0)\ reduced the MAP@5 from 0.86 to 0.76
-     \item A severe blur (σ = 2.0) on validation images dropped the MAP@5 from 0.86 to 0.69
+     \item A moderate blur ($\sigma$ = 1.0)\ reduced the MAP@5 from 0.86 to 0.76
+     \item A severe blur ($\sigma$ = 2.0) on validation images dropped the MAP@5 from 0.86 to 0.69
      \item Low-light conditions (60\% of original brightness) reduced the MAP@5 from 0.86 to 0.80
-     \item A moderate blur (σ = 1.0) and low-light conditions (60\% of original brightness) reduced the MAP@5 to 0.7.
+     \item A moderate blur ($\sigma$ = 1.0) and low-light conditions (60\% of original brightness) reduced the MAP@5 to 0.7.
  \end{itemize}
 
 This model demonstrates strong resilience to brightness variations, likely due to grayscale conversion during training. These findings confirm that our model training strategies and image augmentations enhance the robustness of our model to real-world image variations.
@@ -464,7 +465,7 @@ This model demonstrates strong resilience to brightness variations, likely due t
 
 Most mistakes made by the EfficientNetB5 \& ArcFace model resulted when two separate species were visually similar. For example, the Bottlenose and Spinner dolphins had large amounts of training data; however, they were misclassified due to visual similarity and image quality. 
 
-Errors in classification also commonly occur when the number of images of a certain species is low. For example, the Frasers and Pygmy Killer Whale had a low accuracy relative to other classes, despite measures taken to reduce the effects of limited training data availability. In addition, images that demonstrate heavy motion blur, back lighting, or a lack of scars result in errors in classification. Below is a Grad-CAM heatmap of a misclassified image, in which the model focuses on features of the image that are irrelevant to classification:
+Errors in classification also commonly occur when the number of images of a certain species is low. For example, the Fraser's and Pygmy Killer Whale had a low accuracy relative to other classes, despite measures taken to reduce the effects of limited training data availability. In addition, images that demonstrate heavy motion blur, back lighting, or a lack of scars result in errors in classification. Below is a Grad-CAM heatmap of a misclassified image, in which the model focuses on features of the image that are irrelevant to classification:
 \begin{figure}
     \centering
     \includegraphics[width=0.5\linewidth]{misclassified.jpg}
@@ -517,17 +518,22 @@ The EfficientNetB5 backbone's compound scaling strategy balanced depth, width, a
 
 The 38-point jump in MAP@5 accuracy is the joint result of four architectural and training changes introduced in the \textit{EfficientNetB5 and ArcFace Model} compared to \textit{ResNet and ArcMargin Model}. The key factors contributing to this performance are listed below:
 
-\begin{table}
-    \centering
-    \begin{tabular}{ccc}
-         Factor&  ResNet + ArcMargin& EffNetB5 +  ArcFace\\
-         Backbone Capacity&  ResNet-50 at 224 × 224 px& EfficientNet-B5 at 380 × 380 px with compound scaling\\
-         Loss formulation&  Fixed, static ArcMargin&  ArcFace (stochastic margin)\\
-         Data resolution \& Crops&  Single 224 × 224 center crop& Multi-crop pipeline (full-body, detector \& ViT crops)\\
-         Imbalance Mitigation&  None& Class-balanced weights,\\
-    \end{tabular}
-    \label{tab:my_label}
+\begin{table}[H]
+\centering
+\resizebox{\columnwidth}{!}{
+\begin{tabular}{p{3.5cm} p{5cm} p{5cm}}
+\hline
+Factor & ResNet + ArcMargin & EffNetB5 + ArcFace \\ \hline
+Backbone Capacity & ResNet-50 at 224 × 224 px & EfficientNet-B5 at 380 × 380 px with compound scaling \\
+Loss Formulation & Fixed, static ArcMargin & ArcFace (stochastic margin) \\
+Data Resolution and Crops & Single 224 × 224 center crop & Multi-crop pipeline (full-body, detector and ViT crops) \\
+Imbalance Mitigation & None & Class-balanced weights \\ \hline
+\end{tabular}
+}
+\caption{Comparison of model strategy components contributing to performance.}
+\label{tab:model_strategy_comparison}
 \end{table}
+
 
 \paragraph{1. Backbone capacity and resolution}
 
@@ -543,7 +549,7 @@ The ResNet baseline employed only flips and color changes, whereas the Efficient
 
 \paragraph{4. Imbalance Mitigation}
 
-Happywhale is heavily skewed (9,664 images for \texttt{bottlenose_dolphin} vs. 14 for \texttt{fraser's dolphin}). The EfficientNetB5/ArcFace model mitigated the effects of this by utilizing an ArcFace loss function, minority oversampling, and other methods. 
+Happywhale is heavily skewed (9,664 images for \texttt{bottlenose\_dolphin} vs. 14 for \texttt{Fraser's} dolphin). The EfficientNetB5/ArcFace model mitigated the effects of this by utilizing an ArcFace loss function, minority oversampling, and other methods. 
 
 \subsection{Model Blend (Ensemble)}
 
@@ -611,7 +617,7 @@ From a broader perspective, the findings in this study show the practicality and
 
 3. Marine mammal photo-identification research in the southeast. (2024, June 26). NOAA Fisheries. Retrieved June 14, 2025, from https://www.fisheries.noaa.gov/southeast/endangered-species-conservation/marine-mammal-photo-identification-research-southeast.
 
-4. Tan, M., & Le, Q. V. (2020, September 11). EfficientNet: Rethinking model scaling for convolutional neural networks. arXiv. Retrieved June 14, 2025, from https://arxiv.org/pdf/1905.11946.
+4. Tan, M., \& Le, Q. V. (2020, September 11). EfficientNet: Rethinking model scaling for convolutional neural networks. arXiv. Retrieved June 14, 2025, from https://arxiv.org/pdf/1905.11946.
 
 5. J. Deng, J. Guo, J. Yang, N. Xue, I. Kotsia, S. Zafeiriou. ArcFace: additive angular margin loss for deep face recognition. arXiv preprint, https://arxiv.org/abs/1801.07698 (2018).
 
@@ -625,11 +631,11 @@ From a broader perspective, the findings in this study show the practicality and
 
 10. Brownlee, J. (2021, April 27). Blending ensemble machine learning with Python. Machine Learning Mastery. Retrieved June 15, 2025, from https://machinelearningmastery.com/blending-ensemble-machine-learning-with-python/.
 
-11. Cheeseman, T., Southerland, K., Reade, W., & Howard, A. (2022). Happywhale - whale and dolphin identification. Kaggle. Retrieved June 14, 2025, from https://www.kaggle.com/competitions/happy-whale-and-dolphin/leaderboard.
+11. Cheeseman, T., Southerland, K., Reade, W., \& Howard, A. (2022). Happywhale - whale and dolphin identification. Kaggle. Retrieved June 14, 2025, from https://www.kaggle.com/competitions/happy-whale-and-dolphin/leaderboard.
 
-12. Deng, J., Guo, J., Xue, N., & Zafeiriou, S. (2019, June 20). ArcFace: Additive angular margin loss for deep face recognition. IEEE Xplore. Retrieved June 15, 2025, from https://ieeexplore.ieee.org/document/8953658.
+12. Deng, J., Guo, J., Xue, N., \& Zafeiriou, S. (2019, June 20). ArcFace: Additive angular margin loss for deep face recognition. IEEE Xplore. Retrieved June 15, 2025, from https://ieeexplore.ieee.org/document/8953658.
 
-13. Shorten, C., & Khoshgoftaar, T. M. (2019, July 6). A survey on image data augmentation for deep learning. SpringerOpen. Retrieved June 15, 2025, from https://journalofbigdata.springeropen.com/articles/10.1186/s40537-019-0197-0.
+13. Shorten, C., \& Khoshgoftaar, T. M. (2019, July 6). A survey on image data augmentation for deep learning. SpringerOpen. Retrieved June 15, 2025, from https://journalofbigdata.springeropen.com/articles/10.1186/s40537-019-0197-0.
 
 14. Patton, P. T., Cheeseman, T., Abe, K., Yamaguchi, et. al. (2023, June 5). A deep learning approach to photo– identification demonstrates high performance on two dozen cetacean species. British Ecological Society. Retrieved June 15, 2025, from https://www.pacificwhale.org/wp-content/uploads/2024/04/7.-Methods-Ecol-Evol-2023-Patton-A-deep-learning-approach-to-photo-identification-demonstrates-high-performance-on-two.pdf.
 
@@ -639,7 +645,7 @@ From a broader perspective, the findings in this study show the practicality and
 
 17. Leonard, P. (2022, June 28). AI-powered BirdNET app makes citizen science easier. Cornell Chronicle. Retrieved June 15, 2025, from https://news.cornell.edu/stories/2022/06/ai-powered-birdnet-app-makes-citizen-science-easier.
 
-18. Thompson, J. W., Zero, V. H., Schwacke, L. H., Speakman, T. R., Quigley, B. M., Morey, J. S., & McDonald, T. L. (2021, June 20). finFindR: Automated recognition and identification of marine mammal dorsal fins using residual convolutional neural networks. Wiley Online Library. Retrieved June 14, 2025, from https://doi.org/10.1111/mms.12849.
+18. Thompson, J. W., Zero, V. H., Schwacke, L. H., Speakman, T. R., Quigley, B. M., Morey, J. S., \& McDonald, T. L. (2021, June 20). finFindR: Automated recognition and identification of marine mammal dorsal fins using residual convolutional neural networks. Wiley Online Library. Retrieved June 14, 2025, from https://doi.org/10.1111/mms.12849.
 
-19. Bergler, C., Gebhard, A., Towers, J. R., Butyrev, L., Sutton, G. J., Shaw, T. J. H., Maier, A., & Nöth, E. (2021, December 6). FIN-PRINT a fully-automated multi-stage deep-learning-based framework for the individual recognition of killer whales. Nature. Retrieved June 14, 2025, from https://www.nature.com/articles/s41598-021-02506-6.
+19. Bergler, C., Gebhard, A., Towers, J. R., Butyrev, L., Sutton, G. J., Shaw, T. J. H., Maier, A., \& Nöth, E. (2021, December 6). FIN-PRINT a fully-automated multi-stage deep-learning-based framework for the individual recognition of killer whales. Nature. Retrieved June 14, 2025, from https://www.nature.com/articles/s41598-021-02506-6.
 \end{document}
