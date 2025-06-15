@@ -15,10 +15,9 @@
 \author[2]{Arpit Jasapara}
 \affil[1]{Del Norte High, San Diego, California}
 \affil[2]{University of California Los Angeles, Los Angeles, California}
-\begin{document}
 \date{December 2024}
+\begin{document}
 \maketitle
-
 \begin{abstract}
 Deep learning continues to rapidly advance image recognition capabilities, providing cutting-edge support for wildlife conservation initiatives. In this study, we develop a Convolutional Neural Network (CNN) framework to distinguish individual whales and dolphins extracted from the Happywhale dataset, demonstrating high precision in marine mammal identification. Our model achieves robust feature extraction and enhanced class separability by leveraging an EfficientNetB5 backbone with an ArcFace loss function. Multiple data augmentation techniques, including random cropping, grayscale conversion, and color manipulations, are employed to further strengthen the model’s adaptability across varied imaging conditions. Additionally, a k-nearest neighbors (KNN) algorithm is incorporated at the inference stage to refine predictions, especially for previously unseen images. Through these combined strategies, our final model significantly boosts classification accuracy, achieving a Mean Average Precision at 5 score of 0.88 and showcasing the efficacy of deep learning solutions for fine-grained identification tasks in marine mammal conservation. The promising results highlight the model’s potential for streamlining research workflows and informing long-term conservation strategies for whales, dolphins, and other marine species.
 \newline
@@ -223,95 +222,6 @@ Starting from the all-ones vector, this coordinate search converged in under thr
 \end{equation}
 When these weights are applied to the 30 OOF prediction files, the blended submission scores MAP@5 = 0.88 (±0.002 across folds), a +2.8 pt gain over the best single checkpoint.
 
-\subsection{Evaluation Metrics}
-
-The primary evaluation metric employed in the Happywhale competition on Kaggle is the Mean Average Precision at 5 (MAP@5). This metric is specifically designed to measure the quality of a model’s top-five predictions for each image in the test set, thereby assessing how effectively the model prioritizes correct labels at the highest ranks. By limiting the evaluation to the top five predictions per image, MAP@5 focuses on the model’s ability to accurately pinpoint the correct individual from a shortlist of candidates, rather than requiring it to produce a perfectly ordered, full-length ranking. Such a constraint reflects practical scenarios in which only the top few suggestions matter most, such as identifying a specific whale or dolphin from a large database. 
-
-Additionally, MAP@5 is applied consistently to both validation and test sets, ensuring that the metric used during model tuning and selection is the same as that used in the final evaluation. This consistency fosters reliable model comparison and supports a more robust understanding of how well the model can generalize to new, unseen images.
-
-To define MAP@5 more concretely, let \( U \) be the total number of images in the test (or validation) set, and for each image, assume the model produces \( n \) predicted labels ranked from most to least likely. The value \( k \) represents the position (or cutoff) in the ranked list, with \( k \in \{1, 2, 3, 4, 5\} \), since we only consider the top five predictions. For each image \( u \in \{1, 2, \ldots, U\} \), we denote its correct label as a “relevant” item. The model’s task is to place this relevant label as high as possible among its predicted labels. 
-
-We define a relevance function \( \text{rel}(k) \), which equals 1 if the correct label is found at rank \( k \) and 0 otherwise. The precision at cutoff \( k \), denoted \( P(k) \), is computed as the fraction of correct labels among the top \( k \) predictions:
-\begin{equation}
-P(k) = \frac{\text{Number of relevant labels in top } k}{k}.
-\end{equation}
-Since only one correct label exists per image (under the assumption that each image corresponds to a single individual), any rank \( k \) beyond the first occurrence of the correct label does not contribute additional precision improvements.
-
-The MAP@5 metric is then calculated by summing the precision values at each cutoff \( k \) where the correct label is found and then averaging this quantity across all images. Formally, if we let \( n \) be the number of predictions for each image, and consider only up to \( \min(n, 5) \) predictions for MAP@5, the formula can be expressed as:
-\begin{equation}
-\text{MAP@5} = \frac{1}{U} \sum_{u=1}^{U} \sum_{k=1}^{\min(n, 5)} \text{rel}(k) \cdot P(k).
-\end{equation}
-In this formula, \(U\) represents the number of images, \(P(k)\) represents the precision at cutoff \(k\), \(n\) is the number of predictions per image, and \(rel(k)\) indicates whether the item at rank \(k\) is a correct label. If the item is an incorrect label, the \(rel(k)\) is set to zero.
-
-Once an image is labeled correctly, it's marked as "found" and is no longer considered in the evaluation. On the other hand, if the model predicts the correct label multiple times in a row for a given image, only the first predictions counts for the \(MAP@5\) evaluation, and the rest are dropped.
-
-To illustrate this with a simple example, consider a single image with the correct label “A.” Suppose the model’s top five predictions are [A, B, C, D, E]. The table below demonstrates how \( rel(k) \) and \( P(k) \) are computed:
-
-\begin{table}[ht!]
-\centering
-\renewcommand{\arraystretch}{1.5} % Adjust row height
-\resizebox{0.95\linewidth}{!}{%
-\begin{tabular}{|c|c|c|c|}
-\hline
-\textbf{Rank (k)} & \textbf{Prediction} & \textbf{\( rel(k) \)} & \textbf{\( P(k) \) (Precision at \( k \))} \\ 
-\hline
-1 & A & 1 & \( \frac{1}{1} = 1.0 \) \\ 
-\hline
-2 & B & 0 & \( \frac{1}{2} = 0.5 \) \\ 
-\hline
-3 & C & 0 & \( \frac{1}{3} \approx 0.333 \) \\ 
-\hline
-4 & D & 0 & \( \frac{1}{4} = 0.25 \) \\ 
-\hline
-5 & E & 0 & \( \frac{1}{5} = 0.2 \) \\ 
-\hline
-\end{tabular}%
-}
-\caption{Example computation of \( rel(k) \) and \( P(k) \) for an image with the correct label “A.” The first prediction is correct, so \( rel(k) \) is 1 for \( k = 1 \), and subsequent predictions contribute 0.}
-\label{tab:map5_example}
-\end{table}
-
-In this scenario, the correct label “A” appears at the first position \( k=1 \), so only \( P(1) = 1.0 \) contributes to the average precision for this image. Consequently, the Average Precision for this single image is 1.0. If we had multiple images, we would compute each one’s Average Precision similarly and then average these values to arrive at MAP@5.
-
-By relying on MAP@5, the evaluation ensures that the model does not simply identify the correct individual somewhere down a long list of predictions but ranks it highly within the top five guesses. This is especially important in applications such as whale and dolphin identification, where researchers and conservationists need rapid and reliable identification to inform population tracking, behavioral studies, and conservation strategies. The MAP@5 metric thus provides a practical and meaningful measure of model performance that aligns well with real-world requirements.
-
-Combining the EfficientNetB5 backbone, ArcFace facial discrimination capabilities and other classification methods results in an effective and comprehensive approach to identifying individual whales and dolphins. The result of this use of creating iterations of models for the Happywhale dataset is a model capable of achieving high MAP@5 scores with fine-grained mammal identification tasks.
-
-Throughout this paper we report Mean Average Precision at 5, the official Happywhale competition metric. Unlike simple classification accuracy, which only counts whether a prediction is correct, MAP@5 rewards models that place the correct individual among the top five ranked predictions, with higher weigths awarded for higher ranks. All leaderboard values such as "0.88" refer to MAP@5 scores, not accuracy. In addition, these scores refer to public scores on Kaggle's Happywhale leaderboard, which is comprised of about 24\% of the testing data.
-
-\section{Results}
-
-The experiments for this project were conducted on four distinct deep learning models that identified individual marine animals using various conditions. The Mean Average Precision at 5 was employed as an evaluation metric. Below, we present the outcomes of these models, along with several diagrams, tables, and figures to visualize the architecture of these models and their performances.
-
-\subsection{Architecture Selection Results}
-
-Four distinct models, each developed using various architectures and data augmentation techniques, were evaluated:
-
-\begin{table}[ht!]
-\centering
-\begin{tabular}{|c|c|}
-\hline
-\textbf{Model} & \textbf{MAP@5 Score}\\ 
-\hline
-Basic CNN & 0.10 \\ 
-\hline
-ResNet and ArcMargin & 0.48 \\ 
-\hline
-Baseline Model 1 & 0.77 \\
-\hline
-Baseline Model 2 & 0.79 \\
-\hline
-EffNetB3 and ArcFace& 0.86 \\ 
-\hline
-Model Blend & 0.88 \\ 
-\hline
-\end{tabular}
-\caption{MAP@5 scores for different models presented in this study.}
-\label{tab:model_scores}
-\end{table}
-
-The models’ performance, as measured by Mean Average Precision at 5, shows that the model blend and the third, advanced model demonstrate significantly greater amounts of discriminative power within the top five predictions. The results of these models show the effectiveness of the advanced architectures employed in the third and fourth models and their ability to handle the complexities of the Happywhale dataset and individuals that appear to be visually similar.
-
 \subsection{Model Architectures and Code Excerpts}
 
 To ensure reproducibility and demonstrate the complexity of the models, the following figures show snippets of the TensorFlow/Keras code and Matplotlib graphs used for training each model, embedded as code listings. These snippets provide an overview of the layers, data preprocessing steps, and training loops employed.
@@ -412,6 +322,95 @@ submission.to_csv('submission.csv', index=False)
 The blending approach shown in the code snippet above uses predictions from various models to produce a more well-rounded and robust final result. This demonstrates how several models working in combination can result in increased overall production quality.
 
 In summary, the four models showcased progressed from a relatively simple CNN with a score of 0.10 to a high-performing, blended solution that achieved a score of 0.88, which is higher than other baselines showcased in Table 3. These results represent the outcome of creating several iterations and improvements in making predictions in challenging, fine-grained datasets.
+
+\subsection{Evaluation Metrics}
+
+The primary evaluation metric employed in the Happywhale competition on Kaggle is the Mean Average Precision at 5 (MAP@5). This metric is specifically designed to measure the quality of a model’s top-five predictions for each image in the test set, thereby assessing how effectively the model prioritizes correct labels at the highest ranks. By limiting the evaluation to the top five predictions per image, MAP@5 focuses on the model’s ability to accurately pinpoint the correct individual from a shortlist of candidates, rather than requiring it to produce a perfectly ordered, full-length ranking. Such a constraint reflects practical scenarios in which only the top few suggestions matter most, such as identifying a specific whale or dolphin from a large database. 
+
+Additionally, MAP@5 is applied consistently to both validation and test sets, ensuring that the metric used during model tuning and selection is the same as that used in the final evaluation. This consistency fosters reliable model comparison and supports a more robust understanding of how well the model can generalize to new, unseen images.
+
+To define MAP@5 more concretely, let \( U \) be the total number of images in the test (or validation) set, and for each image, assume the model produces \( n \) predicted labels ranked from most to least likely. The value \( k \) represents the position (or cutoff) in the ranked list, with \( k \in \{1, 2, 3, 4, 5\} \), since we only consider the top five predictions. For each image \( u \in \{1, 2, \ldots, U\} \), we denote its correct label as a “relevant” item. The model’s task is to place this relevant label as high as possible among its predicted labels. 
+
+We define a relevance function \( \text{rel}(k) \), which equals 1 if the correct label is found at rank \( k \) and 0 otherwise. The precision at cutoff \( k \), denoted \( P(k) \), is computed as the fraction of correct labels among the top \( k \) predictions:
+\begin{equation}
+P(k) = \frac{\text{Number of relevant labels in top } k}{k}.
+\end{equation}
+Since only one correct label exists per image (under the assumption that each image corresponds to a single individual), any rank \( k \) beyond the first occurrence of the correct label does not contribute additional precision improvements.
+
+The MAP@5 metric is then calculated by summing the precision values at each cutoff \( k \) where the correct label is found and then averaging this quantity across all images. Formally, if we let \( n \) be the number of predictions for each image, and consider only up to \( \min(n, 5) \) predictions for MAP@5, the formula can be expressed as:
+\begin{equation}
+\text{MAP@5} = \frac{1}{U} \sum_{u=1}^{U} \sum_{k=1}^{\min(n, 5)} \text{rel}(k) \cdot P(k).
+\end{equation}
+In this formula, \(U\) represents the number of images, \(P(k)\) represents the precision at cutoff \(k\), \(n\) is the number of predictions per image, and \(rel(k)\) indicates whether the item at rank \(k\) is a correct label. If the item is an incorrect label, the \(rel(k)\) is set to zero.
+
+Once an image is labeled correctly, it's marked as "found" and is no longer considered in the evaluation. On the other hand, if the model predicts the correct label multiple times in a row for a given image, only the first predictions counts for the \(MAP@5\) evaluation, and the rest are dropped.
+
+To illustrate this with a simple example, consider a single image with the correct label “A.” Suppose the model’s top five predictions are [A, B, C, D, E]. The table below demonstrates how \( rel(k) \) and \( P(k) \) are computed:
+
+\begin{table}[ht!]
+\centering
+\renewcommand{\arraystretch}{1.5} % Adjust row height
+\resizebox{0.95\linewidth}{!}{%
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{Rank (k)} & \textbf{Prediction} & \textbf{\( rel(k) \)} & \textbf{\( P(k) \) (Precision at \( k \))} \\ 
+\hline
+1 & A & 1 & \( \frac{1}{1} = 1.0 \) \\ 
+\hline
+2 & B & 0 & \( \frac{1}{2} = 0.5 \) \\ 
+\hline
+3 & C & 0 & \( \frac{1}{3} \approx 0.333 \) \\ 
+\hline
+4 & D & 0 & \( \frac{1}{4} = 0.25 \) \\ 
+\hline
+5 & E & 0 & \( \frac{1}{5} = 0.2 \) \\ 
+\hline
+\end{tabular}%
+}
+\caption{Example computation of \( rel(k) \) and \( P(k) \) for an image with the correct label “A.” The first prediction is correct, so \( rel(k) \) is 1 for \( k = 1 \), and subsequent predictions contribute 0.}
+\label{tab:map5_example}
+\end{table}
+
+In this scenario, the correct label “A” appears at the first position \( k=1 \), so only \( P(1) = 1.0 \) contributes to the average precision for this image. Consequently, the Average Precision for this single image is 1.0. If we had multiple images, we would compute each one’s Average Precision similarly and then average these values to arrive at MAP@5.
+
+By relying on MAP@5, the evaluation ensures that the model does not simply identify the correct individual somewhere down a long list of predictions but ranks it highly within the top five guesses. This is especially important in applications such as whale and dolphin identification, where researchers and conservationists need rapid and reliable identification to inform population tracking, behavioral studies, and conservation strategies. The MAP@5 metric thus provides a practical and meaningful measure of model performance that aligns well with real-world requirements.
+
+Combining the EfficientNetB5 backbone, ArcFace facial discrimination capabilities and other classification methods results in an effective and comprehensive approach to identifying individual whales and dolphins. The result of this use of creating iterations of models for the Happywhale dataset is a model capable of achieving high MAP@5 scores with fine-grained mammal identification tasks.
+
+Throughout this paper we report Mean Average Precision at 5, the official Happywhale competition metric. Unlike simple classification accuracy, which only counts whether a prediction is correct, MAP@5 rewards models that place the correct individual among the top five ranked predictions, with higher weigths awarded for higher ranks. All leaderboard values such as "0.88" refer to MAP@5 scores, not accuracy. In addition, these scores refer to public scores on Kaggle's Happywhale leaderboard, which is comprised of about 24\% of the testing data.
+
+\section{Results}
+
+The experiments for this project were conducted on four distinct deep learning models that identified individual marine animals using various conditions. The Mean Average Precision at 5 was employed as an evaluation metric. Below, we present the outcomes of these models, along with several diagrams, tables, and figures to visualize the architecture of these models and their performances.
+
+\subsection{Architecture Selection Results}
+
+Four distinct models, each developed using various architectures and data augmentation techniques, were evaluated:
+
+\begin{table}[ht!]
+\centering
+\begin{tabular}{|c|c|}
+\hline
+\textbf{Model} & \textbf{MAP@5 Score}\\ 
+\hline
+Basic CNN & 0.10 \\ 
+\hline
+ResNet and ArcMargin & 0.48 \\ 
+\hline
+Baseline Model 1 & 0.77 \\
+\hline
+Baseline Model 2 & 0.79 \\
+\hline
+EffNetB3 and ArcFace& 0.86 \\ 
+\hline
+Model Blend & 0.88 \\ 
+\hline
+\end{tabular}
+\caption{MAP@5 scores for different models presented in this study.}
+\label{tab:model_scores}
+\end{table}
+
+The models’ performance, as measured by Mean Average Precision at 5, shows that the model blend and the third, advanced model demonstrate significantly greater amounts of discriminative power within the top five predictions. The results of these models show the effectiveness of the advanced architectures employed in the third and fourth models and their ability to handle the complexities of the Happywhale dataset and individuals that appear to be visually similar.
 
 \subsection{Model Interpretability with Grad-CAM}
 
