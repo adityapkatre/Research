@@ -19,32 +19,32 @@
 \begin{document}
 \maketitle
 \begin{abstract}
-Deep learning continues to rapidly advance image recognition capabilities, providing cutting-edge support for wildlife conservation initiatives. In this study, we develop a Convolutional Neural Network (CNN) framework to distinguish individual whales and dolphins extracted from the Happywhale dataset, demonstrating high precision in marine mammal identification. Our model achieves robust feature extraction and enhanced class separability by leveraging an EfficientNetB5 backbone with an ArcFace loss function. Multiple data augmentation techniques, including random cropping, grayscale conversion, and color manipulations, are employed to further strengthen the model’s adaptability across varied imaging conditions. Additionally, a k-nearest neighbors (KNN) algorithm is incorporated at the inference stage to refine predictions, especially for previously unseen images. Through these combined strategies, our final model significantly boosts classification accuracy, achieving a Mean Average Precision at 5 score of 0.88 and showcasing the efficacy of deep learning solutions for fine-grained identification tasks in marine mammal conservation. The promising results highlight the model’s potential for streamlining research workflows and informing long-term conservation strategies for whales, dolphins, and other marine species.
+Deep learning continues to advance image recognition capabilities rapidly, providing cutting-edge support for wildlife conservation initiatives. In this study, we develop a Convolutional Neural Network (CNN) framework to distinguish individual whales and dolphins extracted from the Happywhale dataset, demonstrating high precision in marine mammal identification. Our model achieves robust feature extraction and enhanced class separability by leveraging an EfficientNetB5 backbone with an ArcFace loss function. Multiple data augmentation techniques, including random cropping, grayscale conversion, and color manipulation, are employed further to enhance the model’s adaptability across various imaging conditions. Additionally, a k-nearest neighbors (KNN) algorithm is incorporated at the inference stage to refine predictions, especially for previously unseen images. Through these combined strategies, our final model significantly boosts classification accuracy, achieving a Mean Average Precision at 5 score of 0.88 and showcasing the efficacy of deep learning solutions for fine-grained identification tasks in marine mammal conservation. The promising results highlight the model’s potential for streamlining research workflows and informing long-term conservation strategies for whales, dolphins, and other marine species.
 \newline
 \newline
 Keywords: Marine Mammal Identification, Convolutional Neural Network (CNN), Deep Learning, EfficientNetB5, ArcFace, Data Augmentation, K-Nearest Neighbors (KNN), Wildlife Conservation, MAP@5, Population Tracking
 \end{abstract}
 
 \section{Introduction}
-Identifying and classifying individual marine mammals is critical for research on marine mammal conservation efforts and population tracking. Traditional identification methods rely heavily on manual photo matching, which is time-consuming and prone to human error. Artificial intelligence and machine learning offer robust ways to automate the identification of marine mammals with high accuracy\textsuperscript{1}.
+Identifying and classifying individual marine mammals is critical for research on marine mammal conservation efforts and population tracking. Traditional identification methods rely heavily on manual photo matching, which is time-consuming and prone to human error. Artificial intelligence and machine learning offer robust methods for accurately identifying marine mammals\textsuperscript{1}.
 
-This research leverages the Happywhale dataset, which includes tens of thousands of labeled images representing fifteen thousand unique marine mammal individuals across 30 distinct species. The goal is to create a model capable of effectively and reliably distinguishing individual animals based on physical features such as fluke shape, skin patterns, and body size. This study leverages a pre-trained EfficientNetB5 backbone as the feature extractor and integrates an ArcFace loss layer to enhance model performance by maximizing the separation between classes (i.e., individuals).
+This research leverages the Happywhale dataset, which comprises tens of thousands of labeled images representing over 15,000 unique marine mammal individuals across 30 distinct species. The goal is to create a model capable of effectively and reliably distinguishing individual animals based on physical features such as fluke shape, skin patterns, and body size. This study leverages a pre-trained EfficientNetB5 backbone as the feature extractor and integrates an ArcFace loss layer to enhance model performance by maximizing the separation between classes (i.e., individuals).
 
 Additionally, this research explores various image augmentation techniques to improve the model's generalization ability. This study demonstrates the potential of deep learning for wildlife monitoring and establishes a practical and scalable framework for similar applications where technology meets biology.
 
 \section{Background}
-The Happywhale data set is a whale and dolphin identification challenge consisting of over 51,000 labeled images representing 15,587 unique marine mammals over 30 different species. These images were collected through contributions from marine researchers and photographers supporting the identification, tracking, and conservation of marine mammal populations around the world. Whales and dolphins are typically recognized by their distinct features such as fluke shape, dorsal fin markings, skin patterns, and shape\textsuperscript{2}. However, the difficulty of manually classifying individual images of marine mammals has led to the need for artificial intelligence recognition systems to automate this task. 
+The Happywhale dataset is a whale and dolphin identification challenge comprising over 51,000 labeled images representing 15,587 unique marine mammals from more than 30 different species. These images were collected through contributions from marine researchers and photographers supporting the identification, tracking, and conservation of marine mammal populations worldwide. Whales and dolphins are typically recognized by their distinct features such as fluke shape, dorsal fin markings, skin patterns, and shape\textsuperscript{2}. However, the difficulty of manually classifying individual images of marine mammals has led to the need for artificial intelligence recognition systems to automate this task. 
 
-Identifying individual whales and dolphins is essential to understanding their populations, social dynamics, and migration routes. These marine mammals exhibit unique physical features, like markings or scars, which can serve as natural identifiers. Traditionally, scientists have collected photographs of these markings and manually matched them to existing records. Although this manual photoidentification method has proven to be effective over the years, it is often time consuming and expensive. As researchers gather larger datasets, the potential for human error increases, making it difficult to maintain accuracy. Additionally, this manual process can create significant delays in data analysis, which can be critical when monitoring the health of marine ecosystems and the effect of environmental changes\textsuperscript{3}. Identifying individuals is challenging due to subtle variations in markings, environmental factors, and image quality, making machine learning models essential for use in the real world.
+Identifying individual whales and dolphins is essential to understanding their populations, social dynamics, and migration routes. These marine mammals exhibit unique physical features, like markings or scars, which can serve as natural identifiers. Traditionally, scientists have collected photographs of these markings and manually matched them to existing records. Although this manual photo identification method has proven effective over the years, it is often time-consuming and expensive. As researchers gather larger datasets, the potential for human error increases, making it difficult to maintain accuracy. Additionally, this manual process can create significant delays in data analysis, which can be critical when monitoring the health of marine ecosystems and the effect of environmental changes\textsuperscript{3}. Identifying individuals is challenging due to subtle variations in markings, environmental factors, and image quality, making machine learning models crucial for real-world applications.
 
 The primary objective of this study is to develop a model that can accurately and reliably classify individual whales, dolphins, and other marine animals within the Happywhale dataset. This high-performance identification model will support marine biologists and conservationists in tracking marine mammal populations. The approach utilizes modern machine learning techniques, such as transfer learning and data augmentation. These methods allow the model to handle the complexity and unpredictability of real-world images. 
 
 This research fills a critical gap in marine animal conservation by developing an automated and scalable approach to identify individuals. The methods used in this study are designed to achieve high accuracy and provide a practical tool for conservationists, directly contributing to the sustainability and conservation efforts of marine mammals worldwide. 
 
 \section{Methodology}
-The methodology of this study is to develop the best possible deep learning model to classify whale and dolphin images into specific categories. The model’s design and training processes were optimized to enhance both accuracy and generalizability, leveraging transfer learning, loss functions, and various techniques for data augmentation. Here are the key components used to set up the model:
+The methodology of this study involves developing the best possible deep learning model to classify whale and dolphin images into specific categories. The model’s design and training processes were optimized to enhance both accuracy and generalizability, leveraging transfer learning, loss functions, and various data augmentation techniques. Here are the key components used to set up the model:
 
-The model uses EfficientNetB5 as its backbone. EfficientNetB5 is a convolutional neural network that strikes a balance between accuracy and efficiency, ensuring the model runs promptly while minimally sacrificing accuracy\textsuperscript{4}. The EfficientNetB5 model efficiently scales the neural network across three dimensions: 
+The model uses EfficientNetB5 as its backbone. EfficientNetB5 is a convolutional neural network that strikes a balance between accuracy and efficiency, ensuring the model runs promptly while minimizing the sacrifice of accuracy\textsuperscript{4}. The EfficientNetB5 model efficiently scales the neural network across three dimensions: 
 
 \begin{enumerate}
     \item \textbf{Depth Scaling:} This increases the depth of training data, allowing the model to learn subtle patterns in images. This enables the model to learn from more complex, layered data. However, overusing this method may lead to higher computational demands and a decline in efficiency.
@@ -52,17 +52,17 @@ The model uses EfficientNetB5 as its backbone. EfficientNetB5 is a convolutional
     \item \textbf{Resolution Scaling:} The EfficientNetB5 model scales images in a balanced manner, ensuring that images are high-quality and that nuanced features can be extracted while maintaining a decent level of computational demand.
 \end{enumerate}
 
-The ArcFace loss layer is introduced as the classification head for this model. ArcFace increases the separation between different classes, improving the model’s ability to distinguish images. It achieves this by introducing Additive Angular Margin Loss to the feature vectors. This additional margin in ArcFace creates a more robust distinction between image classes. This enhanced the model’s discriminative learning and accuracy in identifying images across a large subset of classes. The loss layer operates by normalizing each feature and then using a cosine similarity metric for each feature. Then, ArcFace makes it easier to distinguish between classes by adding a fixed angle, or angular margin, between the feature vector and target class. This contributes to making class boundaries more distinct, enforcing a distinct separation between classes.\textsuperscript{5}.
+The ArcFace loss layer is introduced as the classification head for this model. ArcFace increases the separation between different classes, improving the model’s ability to distinguish images. It achieves this by introducing Additive Angular Margin Loss to the feature vectors. This additional margin in ArcFace creates a more robust distinction between image classes. This enhanced the model’s discriminative learning and accuracy in identifying images across a large subset of classes. The loss layer operates by normalizing each feature and then using a cosine similarity metric for each feature. Then, ArcFace makes it easier to distinguish between classes by adding a fixed angle, or angular margin, between the feature vector and the target class. This contributes to making class boundaries more distinct, enforcing a distinct separation between classes\textsuperscript{5}.
 
 \subsection{Architecture Selection Rationale}
 
-Prior to selecting EfficientNetB5 as our backbone architecture, experiments were conducted to compare multiple models on their inferencing capabilities on the Happywhale dataset. Each model was evaluated for Cloud inferencing using Tensor Processing Units (TPUs), accuracy on fine-grained image classification tasks, and memory utilization on high resolution inputs. EfficientNetB5 achieved the best overall balance between computational efficiency, attention to detail, and accuracy, and was therefore selected for this task.
+Prior to selecting EfficientNetB5 as our backbone architecture, experiments were conducted to compare multiple models on their inference capabilities on the Happywhale dataset. Each model was evaluated for Cloud inference using Tensor Processing Units (TPUs), accuracy on fine-grained image classification tasks, and memory utilization on high resolution inputs. EfficientNetB5 achieved the best overall balance between computational efficiency, attention to detail, and accuracy, and was therefore selected for this task.
 
 EfficientNetB5 was compared against several baseline architectures, including ResNet50, EfficientNetB3, EfficientNetB5, and EfficientNetB7. The selection of EfficientNetB5 was based on its balance between accuracy and computational cost. Specifically, EfficientNetB5 demonstrated superior feature extraction capabilities and reasonable computational demand compared to other models when tested on the Happywhale dataset.
 
 \subsection{Data Preparation and Augmentation}
 
-Kaggle’s Happywhale dataset is split into training and testing sets. A CSV file containing the filename for each image and the corresponding label for the image is included. Some labels include: \(bottlenose\_dolphin\), \(beluga\), \(killer\_whale\), \(blue\_whale\), and many others. Each image in the training set undergoes a series of transformations to improve the model’s capability to process and develop an understanding of features in the images. The key transformations that the images undergo include:
+Kaggle’s Happywhale dataset is split into training and testing sets. A CSV file containing the filename for each image and its corresponding label is included. Some labels include: \(bottlenose\_dolphin\), \(beluga\), \(killer\_whale\), \(blue\_whale\), and many others. Each image in the training set undergoes a series of transformations to improve the model’s ability to process and develop an understanding of the features in the images. The key transformations that the images undergo include:
 
 \begin{itemize}
     \item \textbf{Random Cropping:} Images are cropped randomly using full-body, YOLOv5, Detic, or Vision Transformer. This allows the model to focus on specific body parts of the whale or dolphin.
@@ -82,9 +82,9 @@ Kaggle distributes the dataset in two completely separate folders in the Happywh
 
 \subsection{Class Imbalance Analysis}
 
-The Happywhale training dataset exhibits severe class imbalance across species, with bottlenose dolphnis representing 9,664 images while species such as Fraser's dolphins contain only 14 images.  Image classes such as the Killer Whale are in the middle of the pack, representing 962 images in the training dataset. 
+The Happywhale training dataset exhibits severe class imbalance across species, with bottlenose dolphins representing 9,664 images while species such as Fraser's dolphins contain only 14 images.  Image classes such as the Killer Whale are in the middle of the pack, representing 962 images in the training dataset. 
 
-The species distribution follows a pattern commonly seen in real-world ecological datasets. The top five most common species accounts for 64.7\% of all images, while the bottom 10 species collectively represent less than 3\% of the dataset. Individual-level imbalance is even more pronounced, with some individuals appearing in hundreds of images while others have only single instances. 
+The species distribution follows a pattern commonly seen in real-world ecological datasets. The top five most common species account for 64.7\% of all images, while the bottom 10 species collectively represent less than 3\% of the dataset. Individual-level imbalance is even more pronounced, with some individuals appearing in hundreds of images while others have only a single instance. 
 
 \begin{table}[ht]
 \centering
@@ -132,20 +132,20 @@ The species distribution follows a pattern commonly seen in real-world ecologica
 
 Our approach to handling the severe class imbalance combines several complementary techniques rather than relying on traditional oversampling methods. The implementation addresses imbalances at multiple stages of the model creation pipeline:
 \begin{enumerate}
-\item Cross-validation Based Data Splitting: We implemented a 10-fold cross-validation strategy that ensures balanced representation across each fold while maintaining the natural distribution within each fold. This approach helps prevent overfitting to overrepresented classes during training and provides more robust performance across groups with different frequencies in the  dataset. 
-\item Augmentation-based Minority Class Enhancement: Rather than utilizing traditional oversampling methods, we applied data augmentation techniques, such as random horizontal flipping and other techniques, across all classes. This strategy indirectly benefits minority classes by increasing their effective representation through transformations while preserving biological features critical for species identification.
+\item Cross-validation Based Data Splitting: We implemented a 10-fold cross-validation strategy that ensures balanced representation across each fold while maintaining the natural distribution within each fold. This approach helps prevent overfitting to overrepresented classes during training and provides more robust performance across groups with different frequencies in the dataset. 
+\item Augmentation-based Minority Class Enhancement: Rather than using traditional oversampling methods, we applied data augmentation techniques, such as random horizontal flipping and others, across all classes. This strategy indirectly benefits minority classes by increasing their effective representation through transformations while preserving biological features critical for species identification.
 \item Natural distribution preservation: Maintaining original class distribution during training was feasible because natural encounter frequencies present in the training dataset contain valuable ecological information. Artificially balancing the training dataset can disrupt learned patterns that reflect real-world probabilities. 
 \end{enumerate}
 
 \subsection{Training Strategy}
 
-Training occurred on a Tensor Processing Unit (TPU) on Kaggle, significantly speeding up training times for this model and using fewer local resources. The batch size is set to 16 * the number of TPU replicas, leveraging Kaggle’s TPUs.
+Training occurred on a Tensor Processing Unit (TPU) on Kaggle, significantly reducing training times for this model while utilizing fewer resources. The batch size is set to 16 * the number of TPU replicas, leveraging Kaggle’s TPUs.
 
 \paragraph{Runtime Benchmarks}
 
 On Kaggle, the EfficientNetB5 + ArcFace notebook finished all 30 training epochs in 1 hour 15 minutes on a single TPU v3-8 instance.
-On the other hand, running the same code adapted for Kaggle's NVIDIA P100 16 GB GPU required 4 h 7 minutes.
-Therefore, the TPU accelerator devlivers about a 3.3 fold increase for this workload, showcasing the benefits of  TPU usage over GPUs.
+On the other hand, running the same code, adapted for Kaggle's NVIDIA P100 16 GB GPU, required 4 hours and 7 minutes.
+Therefore, the TPU accelerator delivers about a 3.3-fold increase for this workload, showcasing the benefits of  TPU usage over GPUs.
 
 \paragraph{Free Research Tier}
 
@@ -160,7 +160,7 @@ After the CNN produces a 512-dimensional feature vector, a $k$-Nearest-Neighbor 
 For each query to the KNN head, the model performs four steps:
 \begin{enumerate}
     \item Run the image through the CNN and take the 512-dimensional feature vector that is generated right before the ArcFace head.
-    \item Normalize the vector by dividing it by its own magnitude. As a result the vector will have a vector of 1. This results in the dot-product of two vectors being equal to their cosine similarity.
+    \item Normalize the vector by dividing it by its own magnitude. As a result, the vector will have a value of 1. This results in the dot product of two vectors being equal to their cosine similarity.
     \item Use cosine distance to fetch the $k=50$ closest training embeddings.
     \item Use \texttt{scikit-learn}'s \texttt{NearestNeighbors} to find the k closest training vectors. This takes about 14 milliseconds on a single CPU core.
     \item Finally, the KNN head counts how many times each label appears among its neighbors.  The label that appears the most commonly is the prediction. If a tie occurs, the label with the shortest inverse distance is chosen.
@@ -176,13 +176,12 @@ $k=50$ was chosen because smaller values resulted in instability among minority 
 \subsection{Distance-based thresholds for \texttt{new_individual}}
 
 Let $d_{(1)}$ be the distance to the closest neighbor and define a confidence $c = 1 - d_{(1)}$.
-A grid search found that if $c < 0.38$ the safest choice is to output
-the special label \texttt{new\_individual}.
+A grid search found that if $c < 0.38$ the safest choice is to output the special label \texttt{new\_individual}.
 This allowed a balance between false positives of assigning the label \texttt{new_individual} to an image while ensuring this label is not overused.
 
 \subsection{Ensemble and Blending}
 
-The final model predictions are generated through a blending strategy that combines multiple model performances that range between several different epochs and crop augmentations. Additionally, snapshots were taken during various stages of training of the model. These checkpoints were blended using optimized weights to improve the performance of the model. Optimized weights were also used for each model in the ensemble to ensure that the score produced by the ensemble is maximized\textsuperscript{8}. This is represented by the following equation:
+The final model predictions are generated through a blending strategy that combines the performances of multiple models, which range across several different epochs and crop augmentations. Additionally, snapshots were taken at various stages of the model's training. These checkpoints were combined using optimized weights to enhance the model's performance. Optimized weights were also used for each model in the ensemble to ensure that the score produced by the ensemble is maximized\textsuperscript{8}. The following equation represents this:
 \begin{equation}
 P_{\text{final}} = w_1 P_1 + w_2 P_2 + \dots + w_n P_n
 \end{equation}
@@ -193,10 +192,10 @@ P_{\text{final}} = w_1 P_1 + w_2 P_2 + \dots + w_n P_n
 Thirty candidate checkpoints were first shortlisted from a pool of 120 training runs by applying two filters on their out-of-fold predictions:
 \begin{itemize}
     \item A minimum MAP@5 of 0.840 on the 5-fold validation split that keeps each \texttt{individual_id} in a single fold
-    \item Five specialist models trained only on beluga, back fin, or full-body crops were included in the blend, even if scored a lower MAP@5 in isolation. This helps reduce errors made by models that took a more wholistic approach to classifying certain species.
+    \item Five specialist models trained only on beluga, back fin, or full-body crops were included in the blend, even if they scored a lower MAP@5 in isolation. This helps reduce errors made by models that took a more holistic approach to classifying certain species.
 \end{itemize}
 
-This resulted in a total of 30 reasonably strong yet diverse set of predictions, each one stored as a .csv file.
+This resulted in a total of 30 reasonably strong yet diverse sets of predictions, each one stored as a .csv file.
 
 \paragraph{Weight Optimization}
 
@@ -206,7 +205,7 @@ The ensemble score for an identity is calculated using the following equation:
 \begin{equation}
 s_i\;=\;\sum_{j=1}^{30}\alpha_j\,w\!\bigl(r_{ij}\bigr)\;-\;0.033\,f_i,
 \end{equation}
-where \(f_i\) is the number of training photos of that individual and where the special label \texttt{new\_individual} is down-weighted by 4 unless it is ranked first or second to keep its false-positive rate in check.
+where \(f_i\) is the number of training photos of that individual, and where the special label \texttt{new\_individual} is down-weighted by 4 unless it is ranked first or second to keep its false-positive rate in check.
 
 The coefficients \(\boldsymbol{\alpha} \!=\! (\alpha_1,\dots,\alpha_{30})\) were learned with a greedy \emph{coordinate-ascent} search on the same 5-fold split:
 
@@ -257,7 +256,7 @@ model.compile(optimizer='adam',
     metrics=['accuracy'])
 \end{lstlisting}
 \end{minipage}
-\caption{Implementation of the Basic CNN model architecture using TensorFlow/Keras. The model consists of several convolutional layers to extract features from images, and various augmentation methods to improve feature extraction and model performance.}
+\caption{Implementation of the Basic CNN model architecture using TensorFlow/Keras. The model comprises several convolutional layers that extract features from images, along with various augmentation methods to enhance feature extraction and improve model performance.}
 \label{fig:model1}
 \end{figure}
 
@@ -294,18 +293,18 @@ def get_model():
         return model,embed_model
 \end{lstlisting}
 \end{minipage}
-\caption{Python function \texttt{get_model()}, which builds the training network. It adds a batch-norm, dropout, and a 512-D dense layer before compiling with Adam, specifying a learning rate, and ensuring the top-5 accuracy metrics are provided.}
+\caption{Python function \texttt{get_model()}, which builds the training network. It adds a batch normalization, dropout, and a 512-D dense layer before compiling with Adam, specifying a learning rate, and ensuring that the top-5 accuracy metrics are provided.}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.5\linewidth]{learning.png}
-    \caption{Learning rate schedule employed during model training. The x-axis represents training epochs (0-30), and y-axis represents the learning rate (×10⁻⁵). The graph displays three separate phases of training: (1) warm-up phase (epochs 0-6) with an almost linear increase from 1×10⁻⁶ to 8×10⁻⁵, (2) brief sustain phase at maximum learning rate, and (3) exponential decay phase (epochs 6-30) that ultimately reaches 1×10⁻⁶. The schedule increases stability of initial training while preventing overfitting in later epochs, allowing the model to be more fit for real-world scenarios represented in the dataset.}
+    \caption{Learning rate schedule employed during model training. The x-axis represents training epochs (0-30), and the y-axis represents the learning rate (×10⁻⁵). The graph displays three separate phases of training: (1) warm-up phase (epochs 0-6) with an almost linear increase from 1×10⁻⁶ to 8×10⁻⁵, (2) brief sustain phase at maximum learning rate, and (3) exponential decay phase (epochs 6-30) that ultimately reaches 1×10⁻⁶. The schedule increases stability of initial training while preventing overfitting in later epochs, allowing the model to be more fit for real-world scenarios represented in the dataset.}
 \end{figure}
 
-The graph illustrates a learning rate schedule employed during the training process of the model with an EfficientNetB5 backbone. The sharp increase then gradual decrease represents the dynamic adjustment of the learning of the model over time. The learning rate (y-axis) initially follows a warm-up phase, which is quickly followed by a peak. As the number of epochs (x-axis) increases, the learning rate gradually decays, which results in the optimization of the model. 
+The graph illustrates a learning rate schedule employed during the training process of the model with an EfficientNetB5 backbone. The sharp increase, followed by a gradual decrease, represents the dynamic adjustment of the model's learning over time. The learning rate (y-axis) initially follows a warm-up phase, which is quickly followed by a peak. As the number of epochs (x-axis) increases, the learning rate gradually decays, which results in the optimization of the model. 
 
-The model blend, illustrated by the integrated blending and augmentation strategies in the code snippet below, reached the highest MAP@5 score at 0.88. The difference in MAP@5 score is subtle but significant due to the refinement of inference strategies and data handling.
+The model blend, as illustrated by the integrated blending and augmentation strategies in the code snippet below, achieved the highest MAP@5 score of 0.88. The difference in MAP@5 score is subtle but significant due to the refinement of inference strategies and data handling.
 
 \begin{figure}[h!]
 \centering
@@ -316,16 +315,16 @@ submission = pd.DataFrame({'image': test_generator.filenames,  'predictions': te
 submission.to_csv('submission.csv', index=False)
 \end{lstlisting}
 \end{minipage}
-\caption{Implementation of the ensemble blending strategy that combines predictions from checkpoints of several independent models. The blender function uses outputs from 30 model variants to produce final predictions achieving the highest MAP@5 of 0.88}
+\caption{Implementation of the ensemble blending strategy that combines predictions from checkpoints of several independent models. The blender function uses outputs from 30 model variants to produce final predictions, achieving the highest MAP@5 of 0.88.}
 \end{figure}
 
-The blending approach shown in the code snippet above uses predictions from various models to produce a more well-rounded and robust final result. This demonstrates how several models working in combination can result in increased overall production quality.
+The blending approach shown in the code snippet above uses predictions from various models to produce a more well-rounded and robust final result. This demonstrates how multiple models working in combination can lead to improved overall production quality.
 
 In summary, the four models showcased progressed from a relatively simple CNN with a score of 0.10 to a high-performing, blended solution that achieved a score of 0.88, which is higher than other baselines showcased in Table 3. These results represent the outcome of creating several iterations and improvements in making predictions in challenging, fine-grained datasets.
 
 \subsection{Evaluation Metrics}
 
-The primary evaluation metric employed in the Happywhale competition on Kaggle is the Mean Average Precision at 5 (MAP@5). This metric is specifically designed to measure the quality of a model’s top-five predictions for each image in the test set, thereby assessing how effectively the model prioritizes correct labels at the highest ranks. By limiting the evaluation to the top five predictions per image, MAP@5 focuses on the model’s ability to accurately pinpoint the correct individual from a shortlist of candidates, rather than requiring it to produce a perfectly ordered, full-length ranking. Such a constraint reflects practical scenarios in which only the top few suggestions matter most, such as identifying a specific whale or dolphin from a large database. 
+The primary evaluation metric employed in the Happywhale competition on Kaggle is the Mean Average Precision at 5 (MAP@5). This metric is specifically designed to measure the quality of a model’s top-five predictions for each image in the test set, thereby assessing how effectively the model prioritizes correct labels at the highest ranks. By limiting the evaluation to the top five predictions per image, MAP@5 focuses on the model’s ability to accurately pinpoint the correct individual from a shortlist of candidates, rather than requiring it to produce a perfectly ordered, full-length ranking. Such a constraint reflects practical scenarios in which only the top few suggestions are most important, such as identifying a specific whale or dolphin from a large database. 
 
 Additionally, MAP@5 is applied consistently to both validation and test sets, ensuring that the metric used during model tuning and selection is the same as that used in the final evaluation. This consistency fosters reliable model comparison and supports a more robust understanding of how well the model can generalize to new, unseen images.
 
@@ -341,9 +340,9 @@ The MAP@5 metric is then calculated by summing the precision values at each cuto
 \begin{equation}
 \text{MAP@5} = \frac{1}{U} \sum_{u=1}^{U} \sum_{k=1}^{\min(n, 5)} \text{rel}(k) \cdot P(k).
 \end{equation}
-In this formula, \(U\) represents the number of images, \(P(k)\) represents the precision at cutoff \(k\), \(n\) is the number of predictions per image, and \(rel(k)\) indicates whether the item at rank \(k\) is a correct label. If the item is an incorrect label, the \(rel(k)\) is set to zero.
+In this formula, \(U\) represents the number of images, \(P(k)\) represents the precision at cutoff \(k\), \(n\) is the number of predictions per image, and \(rel(k)\) indicates whether the item at rank \(k\) is a correct label if the item is an incorrect label, the \(rel(k)\) is set to zero.
 
-Once an image is labeled correctly, it's marked as "found" and is no longer considered in the evaluation. On the other hand, if the model predicts the correct label multiple times in a row for a given image, only the first predictions counts for the \(MAP@5\) evaluation, and the rest are dropped.
+Once an image is labeled correctly, it's marked as "found" and is no longer considered in the evaluation. On the other hand, if the model predicts the correct label multiple times in a row for a given image, only the first prediction counts for the \(MAP@5\) evaluation, and the rest are dropped.
 
 To illustrate this with a simple example, consider a single image with the correct label “A.” Suppose the model’s top five predictions are [A, B, C, D, E]. The table below demonstrates how \( rel(k) \) and \( P(k) \) are computed:
 
@@ -373,15 +372,15 @@ To illustrate this with a simple example, consider a single image with the corre
 
 In this scenario, the correct label “A” appears at the first position \( k=1 \), so only \( P(1) = 1.0 \) contributes to the average precision for this image. Consequently, the Average Precision for this single image is 1.0. If we had multiple images, we would compute each one’s Average Precision similarly and then average these values to arrive at MAP@5.
 
-By relying on MAP@5, the evaluation ensures that the model does not simply identify the correct individual somewhere down a long list of predictions but ranks it highly within the top five guesses. This is especially important in applications such as whale and dolphin identification, where researchers and conservationists need rapid and reliable identification to inform population tracking, behavioral studies, and conservation strategies. The MAP@5 metric thus provides a practical and meaningful measure of model performance that aligns well with real-world requirements.
+By relying on MAP@5, the evaluation ensures that the model not only identifies the correct individual somewhere in a long list of predictions but also ranks it highly within the top five guesses. This is especially important in applications such as whale and dolphin identification, where researchers and conservationists need rapid and reliable identification to inform population tracking, behavioral studies, and conservation strategies. The MAP@5 metric thus provides a practical and meaningful measure of model performance that aligns well with real-world requirements.
 
-Combining the EfficientNetB5 backbone, ArcFace facial discrimination capabilities and other classification methods results in an effective and comprehensive approach to identifying individual whales and dolphins. The result of this use of creating iterations of models for the Happywhale dataset is a model capable of achieving high MAP@5 scores with fine-grained mammal identification tasks.
+Combining the EfficientNetB5 backbone, ArcFace facial discrimination capabilities, and other classification methods results in an effective and comprehensive approach to identifying individual whales and dolphins. The result of creating iterations of models for the Happywhale dataset is a model capable of achieving high MAP@5 scores in fine-grained mammal identification tasks.
 
-Throughout this paper we report Mean Average Precision at 5, the official Happywhale competition metric. Unlike simple classification accuracy, which only counts whether a prediction is correct, MAP@5 rewards models that place the correct individual among the top five ranked predictions, with higher weigths awarded for higher ranks. All leaderboard values such as "0.88" refer to MAP@5 scores, not accuracy. In addition, these scores refer to public scores on Kaggle's Happywhale leaderboard, which is comprised of about 24\% of the testing data.
+Throughout this paper we report Mean Average Precision at 5, the official Happywhale competition metric. Unlike simple classification accuracy, which only counts whether a prediction is correct, MAP@5 rewards models that place the correct individual among the top five ranked predictions, with higher weights awarded for higher ranks. All leaderboard values, such as "0.88," refer to MAP@5 scores, not accuracy. In addition, these scores refer to public scores on Kaggle's Happywhale leaderboard, which is comprised of about 24\% of the testing data.
 
 \section{Results}
 
-The experiments for this project were conducted on four distinct deep learning models that identified individual marine animals using various conditions. The Mean Average Precision at 5 was employed as an evaluation metric. Below, we present the outcomes of these models, along with several diagrams, tables, and figures to visualize the architecture of these models and their performances.
+The experiments for this project were conducted on four distinct deep learning models that identified individual marine animals under various conditions. The Mean Average Precision at 5 was employed as an evaluation metric. Below, we present the outcomes of these models, along with several diagrams, tables, and figures to visualize the architecture of these models and their performances.
 
 \subsection{Architecture Selection Results}
 
@@ -410,16 +409,15 @@ Model Blend & 0.88 \\
 \label{tab:model_scores}
 \end{table}
 
-The models’ performance, as measured by Mean Average Precision at 5, shows that the model blend and the third, advanced model demonstrate significantly greater amounts of discriminative power within the top five predictions. The results of these models show the effectiveness of the advanced architectures employed in the third and fourth models and their ability to handle the complexities of the Happywhale dataset and individuals that appear to be visually similar.
+The models’ performance, as measured by Mean Average Precision at 5, shows that the model blend and the third, advanced model demonstrate significantly greater amounts of discriminative power within the top five predictions. The results of these models demonstrate the effectiveness of the advanced architectures employed in the third and fourth models, as well as their ability to handle the complexities of the Happywhale dataset and individuals that appear visually similar.
 
 \subsection{Model Interpretability with Grad-CAM}
 
-Understanding why a Neural Network predicts a certain way is crucial for conservation work, where biologists may verify that the algorithm focuses on biologically meaningful visual cues rather than the background. We therefore created Gradient-weighted Class Activation Maps
-(Grad-CAM) for a few images. 
+Understanding why a Neural Network predicts a certain way is crucial for conservation work, where biologists may verify that the algorithm focuses on biologically meaningful visual cues rather than the background. We therefore created Gradient-weighted Class Activation Maps (Grad-CAM) for a few images. 
 
 \paragraph{Code Excerpt}
 
-To create effective heatmaps, a two step process is used. First, the code generates an activation map for a specific image. Then, it overlays the activation map on the original image. The TensorFlow code that implements this is below:
+To create effective heatmaps, a two-step process is used. First, the code generates an activation map for a specific image. Then, it overlays the activation map on the original image. The TensorFlow code that implements this is below:
 
 \begin{lstlisting}[language=Python,basicstyle=\footnotesize\ttfamily]
 heatmap = make_gradcam_heatmap(tensorflow.expand_dims(img, 0),
@@ -437,7 +435,7 @@ jet_heatmap = tensorflow.image.resize(jet_heatmap, img.shape[:2])
 overlay = tf.cast(img, tf.float32) / 255.0 + 0.003 * jet_heatmap
 keras.preprocessing.image.save_img("gradcam_overlay.jpg", overlay)
 \end{lstlisting}
-The resulting images shown below highlight the pixels that affected the prediction of a given individual the most. This provides conservationists visual confirmation that the CNN is focusing on meaningful regions of images.
+The resulting images, shown below, highlight the pixels that most affected the prediction for a given individual. This provides conservationists with visual confirmation that the CNN is focusing on meaningful regions of images.
 
 \paragraph{Grad-CAMs}
 \begin{figure}[H]
@@ -450,7 +448,7 @@ The resulting images shown below highlight the pixels that affected the predicti
 
 \subsection{Model Robustness to Image Quality Degradation}
 
-To quantitatively assess the model to real-world variances in imaging conditions, we systematically evaluated performance under controlled image quality degradations. A subset of 500 validation images provided by the Happywhale competition was processed with varying levels of Gaussian blur (σ = 0.5, 1.0, 2.0 ) and brightness reduction (reduciton of 70\%, 60\%, 50\%). This simulates real-world variances commonly seen images.
+To quantitatively assess the model's performance in real-world imaging conditions, we systematically evaluated its performance under controlled image quality degradations. A subset of 500 validation images provided by the Happywhale competition was processed with varying levels of Gaussian blur (σ = 0.5, 1.0, 2.0 ) and brightness reduction (reduction of 70\%, 60\%, 50\%). This simulates real-world variances commonly seen in images.
 
 Results showed a reasonable degradation in performance:
  \begin{itemize}
@@ -460,13 +458,13 @@ Results showed a reasonable degradation in performance:
      \item A moderate blur (σ = 1.0) and low-light conditions (60\% of original brightness) reduced the MAP@5 to 0.7.
  \end{itemize}
 
-This model demonstrates strong resilience to brightness variations, likely due to grayscale conversion during training. These findings confirm that our model training strategies and images augmentations improves our model's robustness to real-world variances in images.
+This model demonstrates strong resilience to brightness variations, likely due to grayscale conversion during training. These findings confirm that our model training strategies and image augmentations enhance the robustness of our model to real-world image variations.
 
 \subsection{Misclassification Analysis}
 
-Most mistakes made by the EfficientNetB5 \& ArcFace model resulted when two separate species were visually similar. For example, the Bottlenose and Spinner dolphins had large amounts of training data, however they were misclassified due to visual similarity and image quality. 
+Most mistakes made by the EfficientNetB5 \& ArcFace model resulted when two separate species were visually similar. For example, the Bottlenose and Spinner dolphins had large amounts of training data; however, they were misclassified due to visual similarity and image quality. 
 
-Errors in classification also commonly occurred when the number of images of a certain species is low. For example, the Fraser's and Pygmy Killer Whale had a low accuracy relative to other classes, despite measures taken to reduce the effects of limited training data availability. In addition, images that demonstrate heavy motion blur, back lighting, or a lack of scars result in errors in classification. Below is a Grad-CAM heatmap of a misclassified image, in which the model focuses on features of the image that are irrelevant to classification:
+Errors in classification also commonly occur when the number of images of a certain species is low. For example, the Frasers and Pygmy Killer Whale had a low accuracy relative to other classes, despite measures taken to reduce the effects of limited training data availability. In addition, images that demonstrate heavy motion blur, back lighting, or a lack of scars result in errors in classification. Below is a Grad-CAM heatmap of a misclassified image, in which the model focuses on features of the image that are irrelevant to classification:
 \begin{figure}
     \centering
     \includegraphics[width=0.5\linewidth]{misclassified.jpg}
@@ -486,7 +484,7 @@ MAP@5 & 88.6\% ± 0.4 & [88.3\%, 88.9\%] & 88.1\%-89.2\% \\ \hline
 \end{tabular}
 \end{table}
 
-By measuring performance variability using standard deviation and confidence interval computations and proving metric stability across several data partitions, our findings meet the requirement for statistical validation. The reliability of our model's predictions across folds is further supported by the non-parametric Wilcoxon test. 
+By measuring performance variability using standard deviation and confidence interval computations, and demonstrating metric stability across multiple data partitions, our findings meet the requirement for statistical validation. The non-parametric Wilcoxon test further supports the reliability of our model's predictions across folds. 
 
 \subsection{Comparison with other Happywhale Leaderboard Models}
 
@@ -494,25 +492,25 @@ The Kaggle Happywhale - Whale \& Dolphin Identification challenge attracted a to
 
 \section{Discussion}
 
-The performance of the different models tested in this work provides a series of lessons learned about both the challenges and solutions proposed for the individual identification of whales and dolphins. Analyzing the architecture, optimization strategies, and data augmentation techniques used by the various models allows us to identify which factors contribute most to their relative success.
+The performance of the different models tested in this work provides a series of lessons learned about both the challenges and solutions proposed for the individual identification of whales and dolphins. Analyzing the architecture, optimization strategies, and data augmentation techniques employed by various models enables us to identify the factors that contribute most to their relative success.
 
 \subsection{Basic CNN Model}
 
-The Basic CNN Model was implemented using a barebones Convolutional Neural Network (CNN) that served as a baseline model to achieve a score of 0.10. Its limited predictive capabilities can be attributed to several shortcomings apparent in its design and training. Firstly, the architecture of the model required more depth and complexity to increase the model’s discriminative capabilities. The model contained only four convolutional layers and a small amount of image adjustments, both leading to low accuracy. On average, this model struggled with capturing intricate patterns present in the marine mammals in this dataset, such as unique pigmentation, scars, and fin shapes that may be used to distinguish among individuals. In addition, the input images were trimmed, resulting in a loss of fine-grained details necessary for classification. 
+The Basic CNN Model was implemented using a barebones Convolutional Neural Network (CNN) that served as a baseline model to achieve a score of 0.10. Its limited predictive capabilities can be attributed to several shortcomings apparent in its design and training. Firstly, the architecture of the model required more depth and complexity to increase the model’s discriminative capabilities. The model consisted of only four convolutional layers and a limited number of image adjustments, both of which contributed to low accuracy. On average, this model struggled to capture the intricate patterns present in the marine mammals in this dataset, such as unique pigmentation, scars, and fin shapes that may be used to distinguish among individuals. Additionally, the input images were trimmed, resulting in the loss of fine-grained details necessary for classification. 
 
-Additionally, the data augmentation techniques utilized in the Basic CNN Model—such as rotation, width/height shifts, and zoom—fell short in replicating the varied viewing angles, lighting conditions, and occlusions typical of real-world images. The implementation of a dropout layer at a 50\% rate to prevent overfitting might have unintentionally restricted the model’s capacity to capture subtle features. Furthermore, sparse categorical cross-entropy was adopted as the loss function, yet without incorporating more sophisticated methods like margin-based loss, which constrained the model’s effectiveness in differentiating between visually similar individuals effectively.
+Additionally, the data augmentation techniques utilized in the Basic CNN Model—such as rotation, width/height shifts, and zoom—fell short in replicating the varied viewing angles, lighting conditions, and occlusions typical of real-world images. The implementation of a dropout layer at a 50\% rate to prevent overfitting might have unintentionally restricted the model’s capacity to capture subtle features. Furthermore, sparse categorical cross-entropy was adopted as the loss function, yet without incorporating more sophisticated methods, such as margin-based loss, which would have constrained the model’s effectiveness in differentiating between visually similar individuals more effectively.
 
 \subsection{ResNet and ArcMargin Model}
 
-The ResNet and ArcMargin Model introduced significant improvements in accuracy using a ResNet-based architecture and incorporating the ArcMargin loss function, resulting in a significant increase in accuracy to 0.48. The ResNet backbone for this model enabled the model to recognize more nuanced patterns in images compared to the simple CNN. The ResNet and ArcMargin model also mitigated the vanishing gradient problem, reducing the likelihood of training rates stalling or stopping.
+The ResNet and ArcMargin Model introduced significant improvements in accuracy by utilizing a ResNet-based architecture and incorporating the ArcMargin loss function, resulting in a notable increase in accuracy to 0.48. The ResNet backbone for this model enabled the model to recognize more nuanced patterns in images compared to the simple CNN. The ResNet and ArcMargin models also mitigated the vanishing gradient problem, reducing the likelihood of training rates stalling or stopping.
 
-The use of the ArcMargin loss function increased the discriminative power of the models by adding an angular margin to the classification boundary between image labels. This resulted in increased discriminative capabilities for the model, and a higher score using the MAP@5 metric.
+The use of the ArcMargin loss function increased the discriminative power of the models by adding an angular margin to the classification boundary between image labels. This resulted in increased discriminative capabilities for the model and a higher score using the MAP@5 metric.
 
-However, the model's performance plateaued due to certain restrictions on the training strategy and data. In this model, the ArcMargin loss function improved the separation between classes, but it was not an optimal solution for every class in the Happywhale dataset, which contained an imbalance across various species of marine mammals. Additionally, the data processing techniques in this model were relatively basic, resulting in the model's inability to adapt to the real-world variances presented in the dataset.
+However, the model's performance plateaued due to certain restrictions on the training strategy and data. In this model, the ArcMargin loss function improved the separation between classes. Still, it was not an optimal solution for every class in the Happywhale dataset, which contained an imbalance across various species of marine mammals. Additionally, the data processing techniques in this model were relatively basic, resulting in the model's inability to adapt to the real-world variances presented in the dataset.
 
-\textbackslash{}subsection\{EfficientNetB5 and ArcFace Model\} The EfficientNetB5 and ArcFace Model demonstrated a significant performance leap compared to previous models, achieving a MAP@5 score of 0.86. The ArcFace function increased distinctions between marine mammal classes by adding angular boundaries, allowing the model to better handle slight variations in individual appearance. This is crucial for Happywhale, where images of the same animal can vary due to lighting, pose, color, and environmental conditions, while differences between classes can be subtle.
+\subsection\{EfficientNetB5 and ArcFace Model\} The EfficientNetB5 and ArcFace Model demonstrated a significant performance leap compared to previous models, achieving a MAP@5 score of 0.86. The ArcFace function enhanced distinctions between marine mammal classes by introducing angular boundaries, allowing the model to accommodate slight variations in individual appearance more effectively. This is crucial for Happywhale, where images of the same animal can vary due to lighting, pose, color, and environmental conditions, while differences between classes can be subtle.
 
-The EfficientNetB5 backbone's compound scaling strategy balanced depth, width, and resolution in the CNN. Training at 380x380 resolution enabled the model to capture intricate image details. Improved data augmentation techniques including grayscale transformations, color adjustments, and random cropping reduced overfitting likelihood. K-fold cross-validation ensured good generalization to unseen data.
+The EfficientNetB5 backbone's compound scaling strategy balanced depth, width, and resolution in the CNN. Training at 380x380 resolution enabled the model to capture intricate image details. Improved data augmentation techniques, including grayscale transformations, color adjustments, and random cropping, reduced the likelihood of overfitting. K-fold cross-validation ensured good generalization to unseen data.
 
 \subsection{Model Performance Gap}
 
@@ -536,11 +534,11 @@ ResNet-50 processes 224 x 224 px inputs and relies on uniform down-sampling. Muc
 
 \paragraph{2. Loss Formulation}
 
-ArcMargin uses a fixed angular margin, and classes with a few images fail to cross this set threshold. ArcFace instead samples the margin from each mini-batch, creating a boundary that adapts to variations within a class. Switching ResNet to ArcFace is a second cause of a jump in performance between ResNet + ArcMargin and EffNetB5 + ArcFace.
+ArcMargin uses a fixed angular margin, and classes with a few images fail to cross this set threshold. ArcFace instead samples the margin from each mini-batch, creating a boundary that adapts to variations within a class. Switching ResNet to ArcFace is a second cause of the performance jump between ResNet + ArcMargin and EffNetB5 + ArcFace.
 
 \paragraph{3. Multi-crop augmentation}
 
-The ResNet baseline employed only flips and changes in color, yet the EfficientNet-B5 model employs full-body, YOLOv5, Detic, or Vision Transformer. This exposes the model to images that only display certain parts of a marine mammal, as well as the full body of the animal. 
+The ResNet baseline employed only flips and color changes, whereas the EfficientNet-B5 model utilizes full-body, YOLOv5, Detic, or Vision Transformer. This exposes the model to images that only display certain parts of a marine mammal, as well as the full body of the animal. 
 
 \paragraph{4. Imbalance Mitigation}
 
@@ -548,62 +546,62 @@ Happywhale is heavily skewed (9,664 images for \texttt{bottlenose_dolphin} vs. 1
 
 \subsection{Model Blend (Ensemble)}
 
-Our final submission is an ensemble of 30 model checkpoints chosen for their unique strengths. Twenty-five are “generalist’’ models trained on the full dataset with different resolutions, crop pipelines, and augmentation recipes. The other five are specialist models focused on beluga-only, back-fin, or full-body crops that do not make the systematic errors made by the generalists.
+Our final submission is an ensemble of 30 model checkpoints, each chosen for its unique strengths. Twenty-five are “generalist’’ models trained on the full dataset with different resolutions, crop pipelines, and augmentation recipes. The other five are specialist models focused on beluga-only, back-fin, or full-body crops that do not make the systematic errors made by the generalists.
 
-At inference time each model outputs its five most-likely individual IDs. These ranked lists are combined with the weighting scheme and frequency penalty detailed in the \textit{Weight optimization} paragraph of the same section. Because all coefficients were tuned only on out-of-fold (OOF) data, the blend generalities well: it improves the best single checkpoint (MAP@5 = 0.854) to 0.88  MAP@5 on Kaggle’s public leaderboard.
+At inference time, each model outputs its five most likely individual IDs. These ranked lists are combined with the weighting scheme and frequency penalty detailed in the \textit{Weight optimization} paragraph of the same section. Because all coefficients were tuned only on out-of-fold (OOF) data, the blend generalizes well, improving the best single checkpoint (MAP@5 = 0.854) to 0.88 MAP@5 on Kaggle’s public leaderboard.
 
 This concise overview avoids repeating the optimization mechanics while preserving the high-level rationale, composition, and performance of the ensemble.
 
 \subsection{Model and Dataset Limitations}
 
-While the Happywhale dataset is one of the largest publicly available collections of various marine mammals. However, there are several limitations that affect the model performance and real-world applicability of this dataset. 
+While the Happywhale dataset is one of the largest publicly available collections of various marine mammals, it has several limitations that affect the model's performance and real-world applicability. 
 
-The dataset is subject to significant geographic bias, with the majority of reported sightings concentrated in the central and Eastern North Pacific regions such as Hawai'i and Alaska, while areas in the Western Pacific are significantly under sampled due to reduced populations in those areas. This disparity is even more significant in remote areas that are critical for whale populations, such as the Revillagigedo and Aleutian Islands. As a result, models trained using the Happywhale dataset will perform poorly due to less training data on marine mammals in those areas.
+The dataset is subject to significant geographic bias, with the majority of reported sightings concentrated in the central and eastern North Pacific regions, such as Hawai'i and Alaska. In contrast, areas in the Western Pacific are significantly under-sampled due to reduced populations in those regions. This disparity is even more pronounced in remote areas critical for whale populations, such as the Revillagigedo and Aleutian Islands. As a result, models trained using the Happywhale dataset will likely perform poorly due to the limited training data available on marine mammals in those areas.
 
 Temporal bias is another important consideration. The Happywhale dataset reflects significant fluctuations in sampling intensity over time, with peak image reporting during the 2004-2006 SPLASH project. Image reporting lessened during the COVID-19 pandemic, despite thriving marine mammal populations during this time. 
 
 \subsection{Key Model Insights}
 
 \begin{enumerate}
-    \item Loss Functions: Transitioning from basic, cross-entropy loss functions to more advanced ArcMargin and ArcFace loss functions had a positive impact on the ability of the models to classify marine mammals. While cross-entropy loss functions are great for most tasks, they typically focus solely on minimizing the error percentage instead of enforcing the separation of different classes in the parameter space. However, the ArcMargin loss function introduced an angular margin to separate classes, forcing the model to place the predictions farther apart. This enhances the model's capability to make distinctions between visually similar species while maintaining its ability to effectively classify images. Finally, the ArcFace Loss function builds on ArcMargin by adding an angular separator between categories. This allowed the model to be more robust to slight variations in images caused by things such as lighting or camera angles. 
-    \item Model Architectures: The use of model architectures was also critical to the success of more advanced models. The use of the EfficientNetB5 model architecture allowed the model to outperform the basic CNN architecture. This is attributed to this backbone's ability to effectively scale across various levels of depth, width, and resolutions. Selecting architectures that strike a balance between computational efficiency and representational power is important for this machine learning task.
-    \item Data Augmentation: Using data augmentation techniques enhances the robustness of the models through grayscale transformations and color adjustments. This shows the importance of data augmentation strategies in mimicking real-world variances in images and helping the model effectively generalize. 
-    \item Ensembles: The ensemble approach to this Machine Learning challenge showed how combining multiple perspectives on the same data can yield significantly better results. Model four effectively took advantage of the various strengths in snapshots, leading to better performance in the dataset.
-    \item Class Imbalance Limitations: While our approach to handling imbalances showed effectiveness, the extreme imbalance remains a fundamental challenge. Traditional rebalancing techniques were deemed inappropriate for this task due to the potential disruption of natural ecological patterns and need to analyze fine-grained differences in images to classify images. 
-    \item Handling Imbalanced Data: The Happywhale dataset has an unequal distribution of images with an unequal distribution of training samples for certain individuals. However, our models resolved this issue using margin loss and cross-validation to help the model generalize and become more robust to unseen data.
+    \item Loss Functions: Transitioning from basic cross-entropy loss functions to more advanced ArcMargin and ArcFace loss functions had a positive impact on the models' ability to classify marine mammals. While cross-entropy loss functions are effective for most tasks, they typically focus solely on minimizing the error percentage rather than enforcing the separation of different classes in the parameter space. However, the ArcMargin loss function introduced an angular margin to separate classes, forcing the model to place the predictions farther apart. This enhances the model's ability to distinguish between visually similar species while maintaining its capacity to classify images effectively. Finally, the ArcFace Loss function builds on ArcMargin by adding an angular separator between categories. This allowed the model to be more robust to slight variations in images caused by things such as lighting or camera angles. 
+    \item Model Architectures: The use of model architectures was also critical to the success of more advanced models. The use of the EfficientNetB5 model architecture allowed the model to outperform the basic CNN architecture. This is attributed to this backbone's ability to effectively scale across various levels of depth, width, and resolution. Selecting architectures that strike a balance between computational efficiency and representational power is important for this machine learning task.
+    \item Data Augmentation: Using data augmentation techniques enhances the robustness of the models through grayscale transformations and color adjustments. This highlights the importance of data augmentation strategies in simulating real-world image variations and enabling the model to generalize effectively. 
+    \item Ensembles: The ensemble approach to this Machine Learning challenge showed how combining multiple perspectives on the same data can yield significantly better results. Model four effectively leveraged the various strengths in snapshots, resulting in improved performance in the dataset.
+    \item Class Imbalance Limitations: Although our approach to handling imbalances proved effective, the extreme imbalance remains a fundamental challenge. Traditional rebalancing techniques were deemed inappropriate for this task due to the potential disruption of natural ecological patterns and the need to analyze fine-grained differences in images to classify them. 
+    \item Handling Imbalanced Data: The Happywhale dataset has an uneven distribution of images, with an imbalance in the number of training samples for certain individuals. However, our models resolved this issue by utilizing margin loss and cross-validation, which helped the model generalize and become more robust to unseen data.
 \end{enumerate}
 
 \subsection{Practical Applications}
 
-While the technical performance of our machine learning model shows some promise, successfully making an impact on conservation efforts requires integration into existing workflows. This subsection addresses the practicality of this CNN-based approach to identifying marine mammals in the real world.
+While the technical performance of our machine learning model shows some promise, successfully making an impact on conservation efforts requires integration into existing workflows. This subsection examines the practicality of the CNN-based approach for identifying marine mammals in the real world.
 
 \paragraph{Integration with Photo identification Databases}
 
-Citizen science portals and research archives, such as Flukebook, already contain lists of records for thousands of animal images. In order to effectively utilize the CNN, it can be used in an API that receives an uploaded image, returns the top $k$ identity labels for an image, and stores it alongside labels assigned manually by humans. This lightweight integration minimally interferes with a conservationist's workflow while providing benefits.
+Citizen science portals and research archives, such as Flukebook, already contain lists of records for thousands of animal images. To effectively utilize the CNN, it can be integrated into an API that receives an uploaded image, returns the top $k$ identity labels for the image, and stores them alongside labels assigned manually by humans. This lightweight integration minimally interferes with a conservationist's workflow while providing benefits.
 
 \paragraph{Public Engagement and Education}
 
-Embedding the model in a mobile app that allows users to upload images allows whale watchers to obtain instant feedback on which animal they photographed. This mirrors bird identification apps that have increased public participation and raised awareness about ornithology.  In addition, images uploaded to the mobile app may be recoded and used to further improve models, resulting in a positive feedback loop of model improvement and public participation.
+Embedding the model in a mobile app that allows users to upload images enables whale watchers to obtain instant feedback on the animal they have photographed. This mirrors the success of bird identification apps, which have increased public participation and raised awareness about ornithology.  In addition, images uploaded to the mobile app may be reprocessed and used to improve models further, resulting in a positive feedback loop of model improvement and public participation.
 
 \subsection{Comparison with Prior Work}
 
-Existing marine mammal photo identification systems report strong performance on specific tasks. Some examples include: 
+Existing marine mammal photo-identification systems consistently report strong performance on specific tasks. Some examples include: 
 \begin{itemize}
     \item finFindR, created by Thompson et al. in 2021 achieved an 88\% rank-1 match rate and 97\% rank-50 success on common bottlenose dolphins when evaluated \textsuperscript{https://doi.org/10.1111/mms.12849}
     \item FIN-PRINT, created by Bergler et al. in 2021 scored 92.5\% top-1 accuracy and 97.2\% top-3 accuracy on 100 frequently photographed killer-whale individuals\textsuperscript{https://www.nature.com/articles/s41598-021-02506-6}
 \end{itemize}
 
-Our ensemble achieves 0.88 MAP@5 (public) and 0.831 MAP@5 (private), ranking 70 out of 1,588 teams. Although the evaluation metrics performed are different, the results show that our multi-species classification model has lower accuracy but stronger generalization accross the 30 species presented in the Happywhale dataset.
+Our ensemble achieves 0.88 MAP@5 (public) and 0.831 MAP@5 (private), ranking 70 out of 1,588 teams. Although the evaluation metrics performed are different, the results show that our multi-species classification model has lower accuracy but stronger generalization across the 30 species presented in the Happywhale dataset.
 
 \section{Conclusion}
 
-This study is an application of advanced deep learning methodologies to overcome the challenge of identifying marine mammals using the Happywhale dataset. The models leveraged modern convolutional architectures, loss functions, and data augmentation strategies. This research efficiently addresses the challenge of classifying fine-grained image data to advance ecological research. This study showcased models that progressed from a baseline CNN model with limited classification capabilities to high-performing models that incorporate advanced backbones and loss functions to effectively make predictions. This study also acknowledges and address the significant class imbalance present in the dataset, and showcased a non-traditional strategy to mitigate the effects.  
+This study applies advanced deep learning methodologies to address the challenge of identifying marine mammals using the Happywhale dataset. The models leveraged modern convolutional architectures, loss functions, and data augmentation strategies. This research efficiently addresses the challenge of classifying fine-grained image data to advance ecological research. This study showcased models that evolved from a baseline CNN model with limited classification capabilities to high-performing models that incorporate advanced backbones and loss functions, effectively making predictions. This study also acknowledges and addresses the significant class imbalance present in the dataset, showcasing a non-traditional strategy to mitigate its effects.  
 
-The iterative approach of progressing through four separate models shows that refining components ranging from network depth to augmentation methods can lead to breakthroughs in the performance of the machine learning model. Specifically, the KNN algorithm proved to be critical in categorizing unseen images while maintaining a clear, defined boundary between marine mammal species. Using all the techniques described in this study, an identification system has been created to assist environmentalists in tracking marine mammalian populations without relying on labor-intensive manual matching.
+The iterative approach of progressing through four separate models demonstrates that refining components, ranging from network depth to augmentation methods, can lead to breakthroughs in the performance of the machine learning model. Specifically, the KNN algorithm proved to be critical in categorizing unseen images while maintaining a clear, defined boundary between marine mammal species. Using all the techniques described in this study, an identification system has been created to assist environmentalists in tracking marine mammal populations without relying on labor-intensive manual matching.
 
-Beyond its immediate application, this research contributes to the field of wildlife conservation by providing an efficient and scalable way to track species. The model's ability to identify marine mammals is vital to monitor populations and protect marine ecosystems.
+Beyond its immediate application, this research contributes to the field of wildlife conservation by providing an efficient and scalable method for tracking species. The model's ability to identify marine mammals is crucial for monitoring populations and protecting marine ecosystems.
 
-From a wider viewpoint, the findings in this study highlight the practicality and criticalness of implementing deep learning solutions to monitor wildlife and to make inferences on carrying capacity, food webs, and more. The use of machine learning also provides an instant mechanism to support ecological studies and inform conservation programs. This research shows how machine learning helps bridge the gap between technology and environmental science, and it proves to be a vital tool to preserve marine ecosystems for our posterity. The approaches utilized and the lessons learned during this study pave the way for broader adoption of Machine Learning in ecological research. 
+From a broader perspective, the findings in this study underscore the practicality and importance of implementing deep learning solutions to monitor wildlife and draw inferences on carrying capacity, food webs, and other related aspects. The use of machine learning also provides an instant mechanism to support ecological studies and inform conservation programs. This research demonstrates how machine learning helps bridge the gap between technology and environmental science, proving to be a vital tool for preserving marine ecosystems for future generations. The approaches utilized and the lessons learned during this study pave the way for broader adoption of Machine Learning in ecological research. 
 
 \section{References}
 1. K.N. Shivaprakash, N. Swami, S. Mysorekar, R. Arora, A. Gangadharan, K. Vohra, M. Jadeyegowda, J.M. Kiesecker. Potential for artificial intelligence (AI) and machine learning (ML) applications in biodiversity conservation, managing forests, and related services in India. Sustainability. 14, 7154 (2022). https://doi.org/10.3390/su14127154
