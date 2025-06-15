@@ -57,7 +57,7 @@ The ArcFace loss layer is introduced as the classification head for this model. 
 
 \subsection{Architecture Selection Rationale}
 
-Prior to selecting EfficientNetB5 as our backbone architecture, experiments were conducted to compare multiple models on their inferencing capabilities on the Happywhale dataset. Our selection criteria included computational efficiency when using Tensor Processing Units (TPUs), performance on fine-grained image classification tasks, and its ability to process high-resolution images while using maintaining reasonable memory requirements. 
+Prior to selecting EfficientNetB5 as our backbone architecture, experiments were conducted to compare multiple models on their inferencing capabilities on the Happywhale dataset. Each model was evaluated for Cloud inferencing using Tensor Processing Units (TPUs), accuracy on fine-grained image classification tasks, and memory utilization on high resolution inputs. EfficientNetB5 achieved the best overall balance between computational efficiency, attention to detail, and accuracy, and was therefore selected for this task.
 
 EfficientNetB5 was compared against several baseline architectures, including ResNet50, EfficientNetB3, EfficientNetB5, and EfficientNetB7. The selection of EfficientNetB5 was based on its balance between accuracy and computational cost. Specifically, EfficientNetB5 demonstrated superior feature extraction capabilities and reasonable computational demand compared to other models when tested on the Happywhale dataset.
 
@@ -184,9 +184,9 @@ This allowed a balance between false positives of assigning the label \texttt{ne
 \subsection{Ensemble and Blending}
 
 The final model predictions are generated through a blending strategy that combines multiple model performances that range between several different epochs and crop augmentations. Additionally, snapshots were taken during various stages of training of the model. These checkpoints were blended using optimized weights to improve the performance of the model. Optimized weights were also used for each model in the ensemble to ensure that the score produced by the ensemble is maximized\textsuperscript{8}. This is represented by the following equation:
-\[
+\begin{equation}
 P_{\text{final}} = w_1 P_1 + w_2 P_2 + \dots + w_n P_n
-\]
+\end{equation}
  where $w_i$ represents the weight assigned to model $i$ and $P_i$ is its prediction. The complete implementation of our ensemble blending strategy, including a model training notebook and weight selection, is available at https://github.com/adityapkatre/Research.
 
  \paragraph{Model Selection Criteria}
@@ -204,9 +204,9 @@ This resulted in a total of 30 reasonably strong yet diverse set of predictions,
 Let \(r_{ij}\!\in\!\{0,1,\dots,4\}\) be the rank assigned by model \(j\) to identity \(i\).
 Ranks are converted to base scores with the monotone lookup \(w(r)=\{10,\,6.5,\,3.3,\,2.9,\,2.7\}\).
 The ensemble score for an identity is calculated using the following equation:
-\[
+\begin{equation}
 s_i\;=\;\sum_{j=1}^{30}\alpha_j\,w\!\bigl(r_{ij}\bigr)\;-\;0.033\,f_i,
-\]
+\end{equation}
 where \(f_i\) is the number of training photos of that individual and where the special label \texttt{new\_individual} is down-weighted by 4 unless it is ranked first or second to keep its false-positive rate in check.
 
 The coefficients \(\boldsymbol{\alpha} \!=\! (\alpha_1,\dots,\alpha_{30})\) were learned with a greedy \emph{coordinate-ascent} search on the same 5-fold split:
@@ -218,9 +218,9 @@ The coefficients \(\boldsymbol{\alpha} \!=\! (\alpha_1,\dots,\alpha_{30})\) were
 \end{enumerate}
 
 Starting from the all-ones vector, this coordinate search converged in under three minutes and produced the final weight vector:
-\[
+\begin{equation}
 (25,\;7,\;1.5,\;1,\;6,\;1,\;1.5,\;1,\;1,\;1,\;1,\;0.99,\ldots,1.4),
-\]
+\end{equation}
 When these weights are applied to the 30 OOF prediction files, the blended submission scores MAP@5 = 0.88 (±0.002 across folds), a +2.8 pt gain over the best single checkpoint.
 
 \subsection{Evaluation Metrics}
@@ -232,16 +232,15 @@ Additionally, MAP@5 is applied consistently to both validation and test sets, en
 To define MAP@5 more concretely, let \( U \) be the total number of images in the test (or validation) set, and for each image, assume the model produces \( n \) predicted labels ranked from most to least likely. The value \( k \) represents the position (or cutoff) in the ranked list, with \( k \in \{1, 2, 3, 4, 5\} \), since we only consider the top five predictions. For each image \( u \in \{1, 2, \ldots, U\} \), we denote its correct label as a “relevant” item. The model’s task is to place this relevant label as high as possible among its predicted labels. 
 
 We define a relevance function \( \text{rel}(k) \), which equals 1 if the correct label is found at rank \( k \) and 0 otherwise. The precision at cutoff \( k \), denoted \( P(k) \), is computed as the fraction of correct labels among the top \( k \) predictions:
-\[
+\begin{equation}
 P(k) = \frac{\text{Number of relevant labels in top } k}{k}.
-\]
+\end{equation}
 Since only one correct label exists per image (under the assumption that each image corresponds to a single individual), any rank \( k \) beyond the first occurrence of the correct label does not contribute additional precision improvements.
 
 The MAP@5 metric is then calculated by summing the precision values at each cutoff \( k \) where the correct label is found and then averaging this quantity across all images. Formally, if we let \( n \) be the number of predictions for each image, and consider only up to \( \min(n, 5) \) predictions for MAP@5, the formula can be expressed as:
-\[
+\begin{equation}
 \text{MAP@5} = \frac{1}{U} \sum_{u=1}^{U} \sum_{k=1}^{\min(n, 5)} \text{rel}(k) \cdot P(k).
-\]
-
+\end{equation}
 In this formula, \(U\) represents the number of images, \(P(k)\) represents the precision at cutoff \(k\), \(n\) is the number of predictions per image, and \(rel(k)\) indicates whether the item at rank \(k\) is a correct label. If the item is an incorrect label, the \(rel(k)\) is set to zero.
 
 Once an image is labeled correctly, it's marked as "found" and is no longer considered in the evaluation. On the other hand, if the model predicts the correct label multiple times in a row for a given image, only the first predictions counts for the \(MAP@5\) evaluation, and the rest are dropped.
