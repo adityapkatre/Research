@@ -303,14 +303,14 @@ Baseline Model 2 & 0.79 \\
 \hline
 EffNetB3 and ArcFace& 0.86 \\ 
 \hline
-Blend of Models & 0.88 \\ 
+Model Blend & 0.88 \\ 
 \hline
 \end{tabular}
 \caption{MAP@5 scores for different models presented in this study.}
 \label{tab:model_scores}
 \end{table}
 
-The models’ performance, as measured by Mean Average Precision at 5, shows that the blend of models and the third, advanced model demonstrate significantly greater amounts of discriminative power within the top five predictions. The results of these models show the effectiveness of the advanced architectures employed in the third and fourth models and their ability to handle the complexities of the Happywhale dataset and individuals that appear to be visually similar.
+The models’ performance, as measured by Mean Average Precision at 5, shows that the model blend and the third, advanced model demonstrate significantly greater amounts of discriminative power within the top five predictions. The results of these models show the effectiveness of the advanced architectures employed in the third and fourth models and their ability to handle the complexities of the Happywhale dataset and individuals that appear to be visually similar.
 
 \subsection{Model Architectures and Code Excerpts}
 
@@ -395,7 +395,7 @@ def get_model():
 
 The graph illustrates a learning rate schedule employed during the training process of the model with an EfficientNetB5 backbone. The sharp increase then gradual decrease represents the dynamic adjustment of the learning of the model over time. The learning rate (y-axis) initially follows a warm-up phase, which is quickly followed by a peak. As the number of epochs (x-axis) increases, the learning rate gradually decays, which results in the optimization of the model. 
 
-The blend of models, illustrated by the integrated blending and augmentation strategies in the code snippet below, reached the highest MAP@5 score at 0.88. The difference in MAP@5 score is subtle but significant due to the refinement of inference strategies and data handling.
+The model blend, illustrated by the integrated blending and augmentation strategies in the code snippet below, reached the highest MAP@5 score at 0.88. The difference in MAP@5 score is subtle but significant due to the refinement of inference strategies and data handling.
 
 \begin{figure}[h!]
 \centering
@@ -491,7 +491,7 @@ By measuring performance variability using standard deviation and confidence int
 
 \subsection{Comparison with other Happywhale Leaderboard Models}
 
-The Kaggle Happywhale - Whale \& Dolphin Identification challenge attracted a total of 1,588 teams, and the Private Leaderboard, which is comprised of about 76\% of the test data, is used to create the final standings for the competition. The "Preferred Dolphin" team attained the highest competition-wide Private Score of 0.876. The blend of models attained a Private Score of 0.831. This model is ranked 76, placing it higher than about 95.12\% of competitors. \textsuperscript{https://www.kaggle.com/competitions/happy-whale-and-dolphin/leaderboard}
+The Kaggle Happywhale - Whale \& Dolphin Identification challenge attracted a total of 1,588 teams, and the Private Leaderboard, which is comprised of about 76\% of the test data, is used to create the final standings for the competition. The "Preferred Dolphin" team attained the highest competition-wide Private Score of 0.876. The model blend attained a Private Score of 0.831. This model is ranked 76, placing it higher than about 95.12\% of competitors. \textsuperscript{https://www.kaggle.com/competitions/happy-whale-and-dolphin/leaderboard}
 
 \section{Discussion}
 
@@ -515,7 +515,7 @@ However, the model's performance plateaued due to certain restrictions on the tr
 
 The EfficientNetB5 backbone's compound scaling strategy balanced depth, width, and resolution in the CNN. Training at 380x380 resolution enabled the model to capture intricate image details. Improved data augmentation techniques including grayscale transformations, color adjustments, and random cropping reduced overfitting likelihood. K-fold cross-validation ensured good generalization to unseen data.
 
-\subsection{Performance Gap between ResNet + ArcMargin and EffNetB5 + ArcFace}
+\subsection{Model Performance Gap}
 
 The 38-point jump in MAP@5 accuracy is the joint result of four architectural and training changes introduced in the \textit{EfficientNetB5 and ArcFace Model} compared to \textit{ResNet and ArcMargin Model}. The key factors contributing to this performance are listed below:
 
@@ -547,7 +547,7 @@ The ResNet baseline employed only flips and changes in color, yet the EfficientN
 
 Happywhale is heavily skewed (9,664 images for \texttt{bottlenose_dolphin} vs. 14 for \texttt{fraser's dolphin}). The EfficientNetB5/ArcFace model mitigated the effects of this by utilizing an ArcFace loss function, minority oversampling, and other methods. 
 
-\subsection{Blend of Models}
+\subsection{Model Blend (Ensemble)}
 
 Our final submission is an ensemble of 30 model checkpoints chosen for their unique strengths. Twenty-five are “generalist’’ models trained on the full dataset with different resolutions, crop pipelines, and augmentation recipes. The other five are specialist models focused on beluga-only, back-fin, or full-body crops that do not make the systematic errors made by the generalists.
 
@@ -563,7 +563,7 @@ The dataset is subject to significant geographic bias, with the majority of repo
 
 Temporal bias is another important consideration. The Happywhale dataset reflects significant fluctuations in sampling intensity over time, with peak image reporting during the 2004-2006 SPLASH project. Image reporting lessened during the COVID-19 pandemic, despite thriving marine mammal populations during this time. 
 
-\subsection{Key Learnings}
+\subsection{Key Model Insights}
 
 \begin{enumerate}
     \item Loss Functions: Transitioning from basic, cross-entropy loss functions to more advanced ArcMargin and ArcFace loss functions had a positive impact on the ability of the models to classify marine mammals. While cross-entropy loss functions are great for most tasks, they typically focus solely on minimizing the error percentage instead of enforcing the separation of different classes in the parameter space. However, the ArcMargin loss function introduced an angular margin to separate classes, forcing the model to place the predictions farther apart. This enhances the model's capability to make distinctions between visually similar species while maintaining its ability to effectively classify images. Finally, the ArcFace Loss function builds on ArcMargin by adding an angular separator between categories. This allowed the model to be more robust to slight variations in images caused by things such as lighting or camera angles. 
