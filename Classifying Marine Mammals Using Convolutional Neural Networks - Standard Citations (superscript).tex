@@ -10,6 +10,7 @@
 \usepackage{float}
 \usepackage{authblk}
 \usepackage{array}
+\usepackage{xurl}
 
 \title{Classifying Marine Mammals Using Convolutional Neural Networks}
 \author[1]{Aditya Katre}
@@ -20,7 +21,7 @@
 \begin{document}
 \maketitle
 \begin{abstract}
-Deep learning continues to advance image recognition capabilities rapidly, providing cutting-edge support for wildlife conservation initiatives. In this study, we develop a Convolutional Neural Network (CNN) framework to distinguish individual whales and dolphins extracted from the Happywhale dataset, demonstrating high precision in marine mammal identification. Our model achieves robust feature extraction and enhanced class separability by leveraging an EfficientNetB5 backbone with an ArcFace loss function. Multiple data augmentation techniques, including random cropping, grayscale conversion, and color manipulation, are used to improve the model’s adaptability across various imaging conditions. Additionally, a k-nearest neighbors (KNN) algorithm is incorporated at the inference stage to refine predictions, especially when assigning labels to new individuals. By combining these strategies, we were able to boost classification accuracy, reaching a Mean Average Precision at 5 of 0.88. The results show how effective deep learning can be for fine-grained image identification tasks in marine mammal conservation. Beyond accuracy, the model offers real potential to simplify research workflows and support long-term conservation efforts for marine life.
+Deep learning continues to advance image recognition capabilities rapidly, providing cutting-edge support for wildlife conservation initiatives. In this study, we develop a Convolutional Neural Network (CNN) framework to distinguish individual whales and dolphins extracted from the Happywhale dataset, demonstrating high precision in marine mammal identification. Our model achieves robust feature extraction and enhanced class separability by leveraging an EfficientNetB5 backbone with an ArcFace loss function. Multiple data augmentation techniques, including random cropping, grayscale conversion, and color manipulation, are used to improve the model’s adaptability across various imaging conditions. We incorporate a k-nearest neighbors (KNN) algorithm at the inference stage to refine predictions, especially when assigning labels to new individuals. By combining these strategies, we were able to boost classification accuracy, reaching a Mean Average Precision at 5 of 0.88. The results show how effective deep learning can be for fine-grained image identification tasks in marine mammal conservation. Beyond accuracy, the model offers real potential to simplify research workflows and support long-term conservation efforts for marine life.
 \newline
 \newline
 Keywords: Marine Mammal Identification, Convolutional Neural Network (CNN), Deep Learning, EfficientNetB5, ArcFace, Data Augmentation, K-Nearest Neighbors (KNN), Wildlife Conservation, MAP@5, Population Tracking
@@ -63,7 +64,7 @@ EfficientNetB5 was compared against several baseline architectures, including Re
 
 \subsection{Data Preparation and Augmentation}
 
-Kaggle’s Happywhale dataset is split into training and testing sets. A CSV file containing the filename for each image and its corresponding label is included. Some labels include: \(bottlenose\_dolphin\), \(beluga\), \(killer\_whale\), \(blue\_whale\), and many others. Each image in the training set undergoes a series of transformations to improve the model’s ability to process and develop an understanding of the features in the images. The key transformations that the images undergo include:
+Kaggle’s Happywhale dataset is split into training and testing sets. A CSV file containing the filename for each image and its corresponding label is included. Some labels include: \(bottlenose\_dolphin\), \(beluga\), \(killer\_whale\), \(blue\_whale\), and many others. We put each image through a series of transformations to improve the model’s ability to process and develop an understanding of the features in the images. The key transformations that the images undergo include:
 
 \begin{itemize}
     \item \textbf{Random Cropping:} Images are cropped randomly using full-body, YOLOv5, Detic, or Vision Transformer. This allows the model to focus on specific body parts of the whale or dolphin.
@@ -168,13 +169,13 @@ For each query to the KNN head, the model performs four steps:
     \item If the nearest neighbor has a cosine distance greater than $0.62$, we output the special label \texttt{new\_individual}. The cosine distance of 0.62 was chosen because it maximized MAP@5 by accurately assigning the \texttt{new\_individual} label.
 \end{enumerate}
 
-\subsection{Hyper-parameter selection for $k$}
+\subsection{Hyper-parameter Selection for $k$}
 
 A grid search on the validation fold with $k\!=\!1,3,5,10,20,50,75,100$ shows performance peaking at $k=50$. 
 
 $k=50$ was chosen because smaller values resulted in instability among minority classes, and larger values added distractors to predictions.
 
-\subsection{Distance-based thresholds for \texttt{new\_individual}}
+\subsection{Distance-based Thresholds for \texttt{new\_individual}}
 
 Let $d_{(1)}$ be the distance to the closest neighbor and define a confidence $c = 1 - d_{(1)}$.
 A grid search found that if $c < 0.38$ the safest choice is to output the special label \texttt{new\_individual}.
@@ -476,18 +477,20 @@ Errors in classification also commonly occur when the number of images of a cert
 Performing cross-validation analysis revealed consistent model performance across several evaluation metrics. The narrow confidence intervals (\(\leq\)1.0\% width for accuracy and MAP@5) suggest robust generalizability for the model.
 
 \begin{table}
-\begin{tabular}{l c c c}
-\hline
-\textbf{Metric} & \textbf{Mean ± SD} & \textbf{95\% CI} & \textbf{Fold Range} \\ \hline
-Accuracy & 84.1\% ± 0.6 & [83.6\%, 84.6\%] & 83.0\%-84.9\% \\
-F1-Score & 79.4\% ± 1.1 & [78.6\%, 80.2\%] & 77.7\%-80.8\% \\
-MAP@5 & 88.6\% ± 0.4 & [88.3\%, 88.9\%] & 88.1\%-89.2\% \\ \hline
-\end{tabular}
+  \centering
+  \scalebox{0.95}{
+  \centering
+    \begin{tabular}{l c c c}
+      \hline
+      \textbf{Metric} & \textbf{Mean ± SD} & \textbf{95\% CI} & \textbf{Fold Range} \\ \hline
+      MAP@5 & 0.886 ± 0.4 & [0.883, 0.889] & 0.881--0.892 \\ \hline
+    \end{tabular}
+  }
 \end{table}
 
-By measuring performance variability using standard deviation and confidence interval computations, and demonstrating metric stability across multiple data partitions, our findings meet the requirement for statistical validation. The non-parametric Wilcoxon test further supports the reliability of our model's predictions across folds. 
+By measuring performance variability using standard deviation and confidence interval computations, and demonstrating metric stability across multiple data partitions, our findings meet the requirement for statistical validation.
 
-\subsection{Comparison with other Happywhale Leaderboard Models}
+\subsection{Comparison with Other Happywhale Leaderboard Models}
 
 The Kaggle Happywhale - Whale \& Dolphin Identification challenge attracted a total of 1,588 teams, and the Private Leaderboard, which is comprised of about 76\% of the test data, is used to create the final standings for the competition. The "Preferred Dolphin" team attained the highest competition-wide Private Score of 0.876. The model blend attained a Private Score of 0.831. This model is ranked 76, placing it higher than about 95.12\% of competitors\textsuperscript{11}.
 
@@ -563,7 +566,7 @@ This concise overview avoids repeating the optimization mechanics while preservi
 
 While the Happywhale dataset is one of the largest publicly available collections of various marine mammals, it has several limitations that affect the model's performance and real-world applicability. 
 
-The dataset is subject to significant geographic bias, with the majority of reported sightings concentrated in the central and eastern North Pacific regions, such as Hawai'i and Alaska. In contrast, areas in the Western Pacific are significantly under-sampled due to reduced populations in those regions. This disparity is even more pronounced in remote areas critical for whale populations, such as the Revillagigedo and Aleutian Islands. As a result, models trained using the Happywhale dataset will likely perform poorly due to the limited training data available on marine mammals in those areas\textsuperscript{14}.
+The dataset shows significant geographic bias, with the majority of reported sightings concentrated in the central and eastern North Pacific regions, such as Hawai'i and Alaska. In contrast, areas in the Western Pacific are significantly under-sampled due to reduced populations in those regions. This disparity is even more pronounced in remote areas critical for whale populations, such as the Revillagigedo and Aleutian Islands. As a result, models trained using the Happywhale dataset will likely perform poorly due to the limited training data available on marine mammals in those areas\textsuperscript{14}.
 
 Temporal bias is another important consideration. The Happywhale dataset reflects significant fluctuations in sampling intensity over time, with peak image reporting during the 2004-2006 SPLASH project. Image reporting lessened during the COVID-19 pandemic, despite thriving marine mammal populations during this time\textsuperscript{15}. 
 
@@ -582,11 +585,11 @@ Temporal bias is another important consideration. The Happywhale dataset reflect
 
 While the technical performance of our machine learning model shows some promise, successfully making an impact on conservation efforts requires integration into existing workflows. This subsection examines the practicality of this CNN-based approach for identifying marine mammals in the real world.
 
-\paragraph{Integration with Photo identification Databases}
+\paragraph{Integration with Photo Identification Databases:}
 
 Citizen science portals and research archives, such as Flukebook, already contain lists of records for thousands of animal images. To effectively utilize the CNN, it can be integrated into an API that receives an uploaded image, returns the top $k$ identity labels for the image, and stores them alongside labels assigned manually by humans. This lightweight integration minimally interferes with a conservationist's workflow while providing benefits\textsuperscript{16}.
 
-\paragraph{Public Engagement and Education}
+\paragraph{Public Engagement and Education:}
 
 Embedding the model in a mobile app that allows users to upload images to the cloud enables whale watchers to receive instant feedback on animals they have photographed. This follows the success of bird identification apps, which have increased public participation and raised awareness about ornithology\textsuperscript{17}.  In addition, images uploaded to the mobile app may be used to improve models further, creating a positive feedback loop of model improvement and public participation.
 
@@ -616,7 +619,7 @@ From a broader perspective, the findings in this study show the practicality and
 
 2. T. Cheeseman, K. Southerland, W. Reade, A. Howard. Happywhale – whale and dolphin identification: overview. \url{https://www.kaggle.com/competitions/happy-whale-and-dolphin/overview} (2022).
 
-3. NOAA Fisheries. Marine mammal photo-identification research in the southeast. \url{https://www.fisheries.noaa.gov/southeast/endangered-species-conservation/marine-mammal-photo-identification-research-southeast} (2024).
+3. NOAA Fisheries. Marine mammal photo-identification research in the southeast. \url{https://www.fisheries.noaa.gov/southeast/endangered-species-conservation/marine-mammal-photo-identification-research\-southeast} (2024).
 
 4. M. Tan, Q.\,V. Le. EfficientNet: rethinking model scaling for convolutional neural networks. \url{https://arxiv.org/pdf/1905.11946} (2020).
 
